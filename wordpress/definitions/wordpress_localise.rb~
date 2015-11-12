@@ -1,0 +1,59 @@
+#===============================================================================#
+# FILE: wordpress_modify_local.rb
+#===============================================================================#
+# PURPOSE: Setup the application database configuration 
+#===============================================================================#
+# STEPS TAKEN WHEN SETTING UP NODES:
+#   1. Check for environment variable if not empty run 2 and 3
+#   2. create symlink to nfs shared subfolder
+#===============================================================================# 
+
+define :wordpress_localise do
+
+  application = params[:application_name]
+  
+  Chef::Log.info "Wizkru-Deploy: Running wordpress localise for #{application}."
+  
+  Chef::Log.info "Wizkru-Deploy: Running command cp /tmp/wordpress/* #{node[:deploy][application][:current_path]}/"
+  execute "copy wordpress framework" do
+    command "cp -r /tmp/wordpress/* #{node[:deploy][application][:current_path]}/"
+  end
+  
+  Chef::Log.info "Wizkru-Deploy: Running command chown -R deploy:www-data ./"
+  execute "copy wordpress framework" do
+    command "chown -R deploy:www-data ./"
+    cwd "#{node[:deploy][application][:current_path]}/"
+  end
+  
+  Chef::Log.info "Wizkru-Deploy:Creating wp-config.php file in #{node[:deploy][application][:current_path]}/wp-config.php"
+  template "#{node[:deploy][application][:current_path]}/wp-config.php" do
+    source "wp-config.php.erb"
+    owner "root"
+    mode 0644
+    variables ({:application => node[:deploy][application]})
+  end
+  
+  # Only perform migrations on a single appserver to avoid collisions.
+  migration_instance_hostname = node[:opsworks][:layers]['php-app'][:instances].keys.sort.first
+  current_hostname = node[:opsworks][:instance][:hostname]
+  if migration_instance_hostname == current_hostname
+    if !File.exists?("#{node[:deploy][application][:current_path]}/wp-content/deployments/main-deployment.php")
+      Chef::Log.error "Wizkru-Deploy:Error the file #{node[:deploy][application][:current_path]}/wp-content/deployments/main-deployment.php doesn't exist make sure it is added to the repo, is in correct location and has correct casing for file name"
+    end
+    
+    Chef::Log.info "Wizkru-Deploy:Running curl http://#{node["deploy"][application]["domains"].first}/wp-content/deployments/main-deployment.php >> wp-deployment.log"
+    execute "run deployment script" do
+      command "curl http://#{node["deploy"][application]["domains"].first}/wp-content/deployments/main-deployment.php >> wp-deployment.log"
+      cwd "#{node[:deploy][application][:current_path]}/log"
+    end  
+  end
+  
+  
+  
+  #migration_instance_hostname = node[:opsworks][:layers]['php-app'][:instances].keys.sort.first
+  #current_hostname = node[:opsworks][:instance][:hostname]
+  #if migration_instance_hostname == current_hostname
+  
+  #  Chef::Log.info "Attempting to migrate database on #{current_hostname}"
+  #
+end
