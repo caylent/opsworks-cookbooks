@@ -21,7 +21,7 @@
     notifies :run, nfs_mount, :immediatly
   end
  
- def nfs_mount do
+ def nfs_mount
    Chef::Log.info "Caylent-Setup: Create export root folder #{node[:opsworks][:nfs][:export_root]}"
     execute "create export root folder" do 
       command "mkdir #{node[:opsworks][:nfs][:export_root]}"
