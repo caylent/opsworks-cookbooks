@@ -29,7 +29,7 @@ if (File.exists?("/etc/fstab") && File.readlines("/etc/fstab").grep(/caylent/).s
   
   Chef::Log.info "caylent-Setup: Adding mount to FSTAB #{nfs_layer_ip}"
   execute "add mount to FSTAB" do
-    command "echo '#{nfs_layer_ip}:#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:mount_folder]} auto 0 0' >> /etc/fstab" 
+    command "echo '#{nfs_layer_ip}:#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:mount_folder]} nfs auto 0 0' >> /etc/fstab" 
   end
    
   Chef::Log.info "caylent-Setup:mount newly added drives"
