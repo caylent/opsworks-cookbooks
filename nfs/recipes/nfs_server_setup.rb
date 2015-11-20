@@ -6,11 +6,20 @@
 # REQUIRES: nfs-kernel-server package installed
 #===============================================================================#
 # STEPS TAKEN WHEN SETTING UP NODES:
-#   1.Creates Folders
+#   1.Installes Package
+#   2.Creates Folders
 #   2.Adds to /etc/exports
 #   3.Restarts servers
 #
 #===============================================================================# 
+ 
+ package 'Install nfs-kernel-server' do 
+    case node[:platform]
+    when 'ubuntu', 'debian' #ToDo extend to other platforms
+      package_name 'nfs-kernel-server'
+    end
+  end
+ 
  
  Chef::Log.info "Caylent-Setup: Create export root folder #{node[:opsworks][:nfs][:export_root]}"
   execute "create export root folder" do 
