@@ -18,10 +18,8 @@
     when 'ubuntu', 'debian' #ToDo extend to other platforms
       package_name 'nfs-kernel-server'
     end
-    notifies :run, nfs_mount, :immediatly
   end
  
- def nfs_mount
    Chef::Log.info "Caylent-Setup: Create export root folder #{node[:opsworks][:nfs][:export_root]}"
     execute "create export root folder" do 
       command "mkdir #{node[:opsworks][:nfs][:export_root]}"
@@ -57,5 +55,4 @@
         command 'service nfs-kernel-server restart && service idmapd restart'
       end
     end
-  end
 
