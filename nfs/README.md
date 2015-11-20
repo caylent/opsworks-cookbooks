@@ -12,9 +12,9 @@ Add "nfs::nfs_server_setup" to layer serup recipes
 *Can be added to any layer requiring nfs access*
 
 **Setup will file if no nfs layer has "running" status**  
-Add "nfs-common" to OS Packages
-Add "nfs::nfs_server_setup" to layer serup recipes
+Add "nfs-common" to OS Packages.
+Add "nfs::nfs_server_setup" to layer serup recipes.
 
 #Note
-The nfs lar will require 2 runs of setup to make nfs available of the network.
+The nfs layer will require 2 runs of setup to make nfs available of the network.
 
