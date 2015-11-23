@@ -35,7 +35,7 @@ define :wordpress_deployment_localisation do
   end
 
   def remove_current_symlink
-    execute "remove and replace currentsymlink"
+    execute "remove and replace currentsymlink" do
       command "rm #{node[:deploy][$application][:current_path]} && mkdir #{node[:deploy][$application][:current_path]}"
     end
   end
