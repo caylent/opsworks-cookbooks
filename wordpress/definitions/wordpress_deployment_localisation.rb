@@ -58,17 +58,11 @@ define :wordpress_deployment_localisation do
     end
   end
 
-  def add_wpcontent
-
-    execute "copy wordpress framework" do
-      command "rync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
-    end
-  end
 
   def update_wpcontent
 
     execute "copy wordpress framework" do
-      command "rync --recursive --compress -u #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
+      command "rsync --recursive --compress -u #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
     end    
   end
 
