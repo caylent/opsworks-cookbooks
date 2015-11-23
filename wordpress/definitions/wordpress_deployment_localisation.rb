@@ -92,7 +92,7 @@ define :wordpress_deployment_localisation do
     
     deploy_action = "nothing"
     
-    if !File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads")
+    if (!File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads"))
       Chef::Log.info "Caylent-Deploy:No previous version found on share"
       deploy_action = "add"
     end
