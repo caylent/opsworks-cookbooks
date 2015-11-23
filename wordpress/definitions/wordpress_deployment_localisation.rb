@@ -30,12 +30,14 @@ define :wordpress_deployment_localisation do
     Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][$application][:shared_content_folder]}"
     execute "copy wordpress framework" do
       command "rsync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
+      only_if File.exists?("#{node[:deploy][$application][:current_path]}/wp-content")
     end
   end
 
   def remove_current_symlink
     execute "remove and replace currentsymlink" do
       command "rm #{node[:deploy][$application][:current_path]} && mkdir #{node[:deploy][$application][:current_path]}"
+      
     end
   end
  
