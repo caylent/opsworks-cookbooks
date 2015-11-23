@@ -30,6 +30,6 @@ node[:deploy].each do |application, deploy|
   
 end
 
-
+default[:opsworks][:cms_framework][:overwite] = false #There might be a batter place for this
 
 
