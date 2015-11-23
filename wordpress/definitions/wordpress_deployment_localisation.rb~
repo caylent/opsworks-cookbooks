@@ -88,11 +88,22 @@ define :wordpress_deployment_localisation do
   end
 
   def deploy_cms_framework
-    Chef::Log.info "Caylent-Deploy: Checking for previous deployment"
-    
-    deploy_action = "nothing"
     
     
+    if (!File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads"))
+      Chef::Log.info "Caylent-Deploy:No previous version found on share"
+      deploy_action = "add"
+    end
+    
+    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite])
+      Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
+      deploy_action = "update"
+    end
+    
+    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite])
+      Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
+      deploy_action = "overwrite"
+    end
     
     case deploy_action
       when "add"
