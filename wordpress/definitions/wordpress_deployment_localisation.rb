@@ -22,6 +22,15 @@ define :wordpress_deployment_localisation do
   end
   
   
+  #====================================
+  # copies files to the shared folder
+  #===================================
+  def add_wpcontent
+
+    execute "copy wordpress framework" do
+      command "rync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
+    end
+  end
 
  
 
