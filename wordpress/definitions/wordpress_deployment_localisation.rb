@@ -17,9 +17,8 @@ define :wordpress_deployment_localisation do
   if node[:opsworks][:layers].contains("fs-tier")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
     node[:deploy][application][:shared_content_folder] = "#{node[:opsworks][:fs_tier][:export_full_path]}/#{application}"
-    
   else
-      Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
+    Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
   end
   
   deploy_cms_framework
@@ -46,7 +45,6 @@ define :wordpress_deployment_localisation do
       mode 0644
       variables ({:application => node[:deploy][application]})
     end
-
   end
 
   def add_wpcontent
@@ -60,16 +58,14 @@ define :wordpress_deployment_localisation do
 
     execute "copy wordpress framework" do
       command "rync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
-    end
-    
+    end    
   end
 
   def overwrite_wpcontent
 
     execute "copy wordpress framework" do
       command "cp -R #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
-    end
-    
+    end    
   end
 
   def link_wpcontent
@@ -101,12 +97,12 @@ define :wordpress_deployment_localisation do
       deploy_action = "add"
     end
     
-    if File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite]
+    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
       deploy_action = "update"
     end
     
-    if File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite]
+    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
       deploy_action = "overwrite"
     end
@@ -114,33 +110,33 @@ define :wordpress_deployment_localisation do
     case deploy_action
       when "add"
         Chef::Log.info "Caylent-Deploy: Case Match for Add"
-      add_wpcontent
-      #check_for_sql_file
-      remove_current_symlink
-      setup_wordpress_framework
-      link_wpcontent
-      update_permissions
-    
-    when "update"
-      Chef::Log.info "Caylent-Deploy: Case Match for Update"
-      update_wpcontent
-      #check_for_sql_file
-      remove_current_symlink
-      setup_wordpress_framework
-      link_wpcontent
-      update_permissions
-        
-    when "overwrite"
-     Chef::Log.info "Caylent-Deploy: Case Match for Overwrite"
+        add_wpcontent
+        #check_for_sql_file
+        remove_current_symlink
+        setup_wordpress_framework
+        link_wpcontent
+        update_permissions
       
-      overwrite_wpcontent
-      #check_for_sql_file
-      remove_current_symlink
-      setup_wordpress_framework
-      link_wpcontent
-      update_permissions
-    else
-      Chef::Log.info "Caylent-deploy: No case matched so no other actions taken"
+      when "update"
+        Chef::Log.info "Caylent-Deploy: Case Match for Update"
+        update_wpcontent
+        #check_for_sql_file
+        remove_current_symlink
+        setup_wordpress_framework
+        link_wpcontent
+        update_permissions
+        
+      when "overwrite"
+       Chef::Log.info "Caylent-Deploy: Case Match for Overwrite"
+        
+        overwrite_wpcontent
+        #check_for_sql_file
+        remove_current_symlink
+        setup_wordpress_framework
+        link_wpcontent
+        update_permissions
+      else
+        Chef::Log.info "Caylent-deploy: No case matched so no other actions taken"
     end
   end
 end
