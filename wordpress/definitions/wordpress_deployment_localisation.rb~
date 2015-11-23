@@ -95,7 +95,7 @@ end
 
 def "deploy_cms_framework"
   Chef::Log.info "Caylent-Deploy: Checking for previous deployment"
-  if(!File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" ) #ToDo this should not check wp-config
+  if !File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" ) #ToDo this should not check wp-config
       Chef::Log.info "Caylent-Deploy:No previous version found on share"
        
       add_wpcontent
@@ -105,7 +105,7 @@ def "deploy_cms_framework"
       link_wpcontent
       update_permissions
     
-    else if ( File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" && !node[:opsworks][:cms_framework][:overwite])
+    else if  File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite]
       Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
       update_wpcontent
       #check_for_sql_file
@@ -114,7 +114,7 @@ def "deploy_cms_framework"
       link_wpcontent
       update_permissions
       
-    else if ( File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" && node[:opsworks][:cms_framework][:overwite])
+    else if  File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite]
     
       Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
       overwrite_wpcontent
