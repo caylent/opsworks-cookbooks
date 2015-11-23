@@ -12,7 +12,7 @@ define :wordpress_deployment_localisation do
 
  @application = params[:application_name]
   
-  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{@application}."
+  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{@application}. #{node[:deploy][@application][:shared_content_folder]"
   
   if node[:opsworks][:layers].include?("fs-tier")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
