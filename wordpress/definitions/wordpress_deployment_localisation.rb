@@ -64,14 +64,14 @@ define :wordpress_deployment_localisation do
   def update_wpcontent
 
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress -u #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
+      command "rsync --recursive --compress -u #{node[:deploy][$application][:current_path]}/wp-content/* #{node[:deploy][$application][:shared_content_folder]}"
     end    
   end
 
   def overwrite_wpcontent
 
     execute "copy wordpress framework" do
-      command "cp -R #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
+      command "cp -R #{node[:deploy][$application][:current_path]}/wp-content/* #{node[:deploy][$application][:shared_content_folder]}"
     end    
   end
 
