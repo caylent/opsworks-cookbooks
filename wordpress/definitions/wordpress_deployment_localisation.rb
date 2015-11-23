@@ -32,7 +32,7 @@ define :wordpress_deployment_localisation do
     end
   end
 
-  def "setup_wordpress_framework"
+  def setup_wordpress_framework
 
     Chef::Log.info "Caylent-Deploy: Running command cp /tmp/wordpress/* #{node[:deploy][application][:current_path]}/"
     execute "copy wordpress framework" do
@@ -49,7 +49,7 @@ define :wordpress_deployment_localisation do
 
   end
 
-  def "add_wpcontent"
+  def add_wpcontent
 
     execute "copy wordpress framework" do
       command "rync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
@@ -58,7 +58,7 @@ define :wordpress_deployment_localisation do
     
   end
 
-  def "update_wpcontent"
+  def update_wpcontent
 
     execute "copy wordpress framework" do
       command "rync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
@@ -66,7 +66,7 @@ define :wordpress_deployment_localisation do
     
   end
 
-  def "overwrite_wpcontent"
+  def overwrite_wpcontent
 
     execute "copy wordpress framework" do
       command "cp -R #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
@@ -74,14 +74,14 @@ define :wordpress_deployment_localisation do
     
   end
 
-  def "link_wpcontent"
+  def link_wpcontent
 
     execute "create symlink" do
       command " ln -s #{node[:deploy][application][:shared_content_folder]} #{node[:deploy][application][:current_path]}/wp-content"
     end
   end
       
-  def "update_permissions"
+  def update_permissions
     Chef::Log.info "Caylent-Deploy: Running command chown -R deploy:www-data ./"
     execute "owner" do
       command "chown -R deploy:www-data ./"
@@ -93,7 +93,7 @@ define :wordpress_deployment_localisation do
     end
   end
 
-  def "deploy_cms_framework"
+  def deploy_cms_framework
     Chef::Log.info "Caylent-Deploy: Checking for previous deployment"
     if !File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" ) #ToDo this should not check wp-config
         Chef::Log.info "Caylent-Deploy:No previous version found on share"
