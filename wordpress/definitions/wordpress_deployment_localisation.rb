@@ -87,56 +87,6 @@ define :wordpress_deployment_localisation do
     end
   end
 
-  def deploy_cms_framework
-    
-    
-    if (!File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads"))
-      Chef::Log.info "Caylent-Deploy:No previous version found on share"
-      deploy_action = "add"
-    end
-    
-    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite])
-      Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
-      deploy_action = "update"
-    end
-    
-    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite])
-      Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
-      deploy_action = "overwrite"
-    end
-    
-    case deploy_action
-      when "add"
-        Chef::Log.info "Caylent-Deploy: Case Match for Add"
-        add_wpcontent
-        #check_for_sql_file
-        remove_current_symlink
-        setup_wordpress_framework
-        link_wpcontent
-        update_permissions
-      
-      when "update"
-        Chef::Log.info "Caylent-Deploy: Case Match for Update"
-        update_wpcontent
-        #check_for_sql_file
-        remove_current_symlink
-        setup_wordpress_framework
-        link_wpcontent
-        update_permissions
-        
-      when "overwrite"
-       Chef::Log.info "Caylent-Deploy: Case Match for Overwrite"
-        
-        overwrite_wpcontent
-        #check_for_sql_file
-        remove_current_symlink
-        setup_wordpress_framework
-        link_wpcontent
-        update_permissions
-      else
-        Chef::Log.info "Caylent-deploy: No case matched so no other actions taken"
-    end
-    
-  end
+  
 end
 
