@@ -54,8 +54,6 @@ define :wordpress_deployment_localisation do
     execute "copy wordpress framework" do
       command "rync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content #{node[:deploy][application][:shared_content_folder]}"
     end
-    
-    
   end
 
   def update_wpcontent
@@ -95,36 +93,37 @@ define :wordpress_deployment_localisation do
 
   def deploy_cms_framework
     Chef::Log.info "Caylent-Deploy: Checking for previous deployment"
-    if !File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" ) #ToDo this should not check wp-config
-        Chef::Log.info "Caylent-Deploy:No previous version found on share"
-         
-        add_wpcontent
-        #check_for_sql_file
-        remove_current_symlink
-        setup_wordpress_framework
-        link_wpcontent
-        update_permissions
-      
-      else if  File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite]
-        Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
-        update_wpcontent
-        #check_for_sql_file
-        remove_current_symlink
-        setup_wordpress_framework
-        link_wpcontent
-        update_permissions
+    case !File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads" ) #ToDo this should not check wp-config
+      Chef::Log.info "Caylent-Deploy:No previous version found on share"
+       
+      add_wpcontent
+      #check_for_sql_file
+      remove_current_symlink
+      setup_wordpress_framework
+      link_wpcontent
+      update_permissions
+    
+    when  File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads"), !node[:opsworks][:cms_framework][:overwite]
+      Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
+      update_wpcontent
+      #check_for_sql_file
+      remove_current_symlink
+      setup_wordpress_framework
+      link_wpcontent
+      update_permissions
         
-      else if  File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite]
-      
-        Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
-        overwrite_wpcontent
-        #check_for_sql_file
-        remove_current_symlink
-        setup_wordpress_framework
-        link_wpcontent
-        update_permissions
-      end
+    when  File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads"), node[:opsworks][:cms_framework][:overwite]
+    
+      Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
+      overwrite_wpcontent
+      #check_for_sql_file
+      remove_current_symlink
+      setup_wordpress_framework
+      link_wpcontent
+      update_permissions
+    else
+      Chef::Log.info "Caylent-deploy: No deployment case matched so no other actions taken"
+    end
   end
-
 end
 
