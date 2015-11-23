@@ -30,8 +30,9 @@ define :wordpress_deployment_localisation do
     Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][$application][:shared_content_folder]}"
     execute "copy wordpress framework" do
       command "rsync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
-      only_if File.exists?("#{node[:deploy][$application][:current_path]}/wp-content")
+      only_if { File.exists?("#{node[:deploy][$application][:current_path]}/wp-content")}
     end
+    
   end
 
   def remove_current_symlink
@@ -99,17 +100,17 @@ define :wordpress_deployment_localisation do
     
     deploy_action = "nothing"
     
-    if (!File.exists?("#{node[:deploy][$application][:shared_content_folder]}/uploads"))
+    if (!File.exists?("#{node[:deploy][$application][:shared_content_folder]}/wp-content"))
       Chef::Log.info "Caylent-Deploy:No previous version found on share"
       deploy_action = "add"
     end
     
-    if (File.exists?("#{node[:deploy][$application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite])
+    if (File.exists?("#{node[:deploy][$application][:shared_content_folder]}/wp-content") && !node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
       deploy_action = "update"
     end
     
-    if (File.exists?("#{node[:deploy][$application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite])
+    if (File.exists?("#{node[:deploy][$application][:shared_content_folder]}/wp-content") && node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
       deploy_action = "overwrite"
     end
