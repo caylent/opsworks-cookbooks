@@ -26,7 +26,8 @@ define :wordpress_deployment_localisation do
   # copies files to the shared folder
   #===================================
   def add_wpcontent
-
+    Chef::Log.debug "Caylent-deploy:Wordpress add copy from #{node[:deploy][@application][:current_path]}/wp-content"
+    Chef::Log.debug "Caylent-deploy:Wordpress add copy to #{node[:deploy][@application][:shared_content_folder]}"
     execute "copy wordpress framework" do
       command "rync --recursive --compress #{node[:deploy][@application][:current_path]}/wp-content #{node[:deploy][@application][:shared_content_folder]}"
     end
