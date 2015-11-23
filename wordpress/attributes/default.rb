@@ -26,7 +26,7 @@ node[:deploy].each do |application, deploy|
     default[:deploy][application][:wp_prefix] = node[:deploy][application][:environment_variables][:wp_prefix]
   end
   
-  default[:deploy][application][:shared_content_folder] = "#{node[:opsworks][:deploy][:appdirectory]}/shared/wp-content"
+  default[:deploy][application][:shared_content_folder] = "#{node[:deploy][application][:deploy_to]}/shared/wp-content"
   
 end
 
