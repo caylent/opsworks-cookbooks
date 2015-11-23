@@ -21,7 +21,7 @@ define :wordpress_deployment_localisation do
     Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
   end
   
-  deploy_cms_framework
+  
 
  
 
@@ -78,5 +78,7 @@ define :wordpress_deployment_localisation do
     end
     
   end
+  
+  deploy_cms_framework
 end
 
