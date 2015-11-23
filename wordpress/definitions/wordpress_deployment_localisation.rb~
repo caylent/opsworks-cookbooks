@@ -24,7 +24,7 @@ define :wordpress_deployment_localisation do
   
   deploy_cms_framework
        
-end
+
 
   def remove_current_symlink
     execute "remove and replace currentsymlink"
@@ -126,5 +126,5 @@ end
       end
   end
 
-
+end
 
