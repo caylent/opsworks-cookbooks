@@ -13,7 +13,7 @@ define :wordpress_deployment_localisation do
  @application = params[:application_name]
   application = params[:application_name]
   $application = params[:application_name]
-  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{@application}. 1: #{node[:deploy][@application][:shared_content_folder]} 2: #{node[:deploy][application][:shared_content_folder]} "
+  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{$application}. 1: #{node[:deploy][$application][:shared_content_folder]} 2: #{node[:deploy][application][:shared_content_folder]} "
   
   if node[:opsworks][:layers].include?("fs-tier")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
@@ -27,13 +27,18 @@ define :wordpress_deployment_localisation do
   # copies files to the shared folder
   #===================================
   def add_wpcontent
-    Chef::Log.debug "Caylent-deploy:Wordpress add copy from #{node[:deploy][$application][:current_path]}/wp-content"
-    Chef::Log.debug "Caylent-deploy:Wordpress add copy to #{node[:deploy][@application][:shared_content_folder]}"
+    Chef::Log.info "Caylent-deploy:Wordpress add copy from #{node[:deploy][$application][:current_path]}/wp-content"
+    Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][@application][:shared_content_folder]}"
     execute "copy wordpress framework" do
       command "rsync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
     end
   end
 
+  def remove_current_symlink
+    execute "remove and replace currentsymlink"
+      command "rm #{node[:deploy][$application][:current_path]} && mkdir #{node[:deploy][$application][:current_path]}"
+    end
+  end
  
 
   def deploy_cms_framework
