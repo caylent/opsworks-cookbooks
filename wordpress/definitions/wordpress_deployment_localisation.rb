@@ -10,13 +10,13 @@
 
 define :wordpress_deployment_localisation do
 
-  application = params[:application_name]
+ @application = params[:application_name]
   
-  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{application}."
+  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{@application}."
   
   if node[:opsworks][:layers].include?("fs-tier")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
-    node[:deploy][application][:shared_content_folder] = "#{node[:opsworks][:fs_tier][:export_full_path]}/#{application}"
+    node[:deploy][@application][:shared_content_folder] = "#{node[:opsworks][:fs_tier][:export_full_path]}/#{@application}"
   else
     Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
   end
@@ -30,17 +30,17 @@ define :wordpress_deployment_localisation do
     
     deploy_action = "nothing"
     
-    if (!File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads"))
+    if (!File.exists("#{node[:deploy][@application][:shared_content_folder]}/uploads"))
       Chef::Log.info "Caylent-Deploy:No previous version found on share"
       deploy_action = "add"
     end
     
-    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite])
+    if (File.exists("#{node[:deploy][@application][:shared_content_folder]}/uploads") && !node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
       deploy_action = "update"
     end
     
-    if (File.exists("#{node[:deploy][application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite])
+    if (File.exists("#{node[:deploy][@application][:shared_content_folder]}/uploads") && node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
       deploy_action = "overwrite"
     end
