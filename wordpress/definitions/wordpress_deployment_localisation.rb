@@ -14,7 +14,7 @@ define :wordpress_deployment_localisation do
   
   Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{application}."
   
-  if(node[:opsworks][:layers].contains("fs-tier")
+  if node[:opsworks][:layers].contains("fs-tier")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
     node[:deploy][application][:shared_content_folder] = "#{node[:opsworks][:fs_tier][:export_full_path]}/#{application}"
     
@@ -28,8 +28,8 @@ end
 
 def "remove_current_symlink"
   execute "remove and replace currentsymlink"
-      command "rm #{node[:deploy][application][:current_path]} && mkdir #{node[:deploy][application][:current_path]}"
-    end
+    command "rm #{node[:deploy][application][:current_path]} && mkdir #{node[:deploy][application][:current_path]}"
+  end
 end
 
 def "setup_wordpress_framework"
