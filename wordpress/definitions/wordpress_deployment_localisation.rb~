@@ -93,9 +93,14 @@ define :wordpress_deployment_localisation do
 
   def link_wpcontent
 
-    execute "create symlink" do
-      command " ln -s #{node[:deploy][$application][:shared_content_folder]} #{node[:deploy][$application][:current_path]}/wp-content"
+    link "#{node[:deploy][$application][:current_path]}/wp-content" do
+      to "#{node[:deploy][$application][:shared_content_folder]}"
+      link_type :symbolic
+      owner "deploy"
+      group "www-data"
+      mode "775"
     end
+    
   end
       
   def update_permissions
