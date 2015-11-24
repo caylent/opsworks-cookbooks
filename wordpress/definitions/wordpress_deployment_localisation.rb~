@@ -38,7 +38,15 @@ define :wordpress_deployment_localisation do
   def remove_current_symlink
     Chef::Log.info "Caylent-Deploy: Do Nothing"
     execute "remove and replace currentsymlink" do
-      command "rm #{node[:deploy][$application][:current_path]} && mkdir #{node[:deploy][$application][:current_path]} && chmod -R 777 #{node[:deploy][$application][:current_path]}"           
+      command "rm #{node[:deploy][$application][:current_path]}"           #ToDo Current needs to be a symlink
+    end
+    
+    link "#{node[:deploy][$application][:current_path]}" do
+      to "#{node[:deploy][$application][:deploy_to]}/core_framwork"
+      link_type :symbolic
+      owner "deploy"
+      group "www-data"
+      mode "775"
     end
     
   end
@@ -48,9 +56,15 @@ define :wordpress_deployment_localisation do
 
   def setup_wordpress_framework
 
+    directory "#{node[:deploy][$application][:deploy_to]}/core_framwork/" do
+      owner 'deploy'
+      group 'www-data'
+      mode '775'
+    end
+    
     Chef::Log.info "Caylent-Deploy: Running command cp /tmp/wordpress/* #{node[:deploy][$application][:current_path]}/"
     execute "copy wordpress framework" do
-      command "cp -r /tmp/wordpress/* #{node[:deploy][$application][:current_path]}/"
+      command "cp -r /tmp/wordpress/* #{node[:deploy][$application][:deploy_to]}/core_framwork/"
     end
     
     Chef::Log.info "Caylent-Deploy:Creating wp-config.php file in #{node[:deploy][$application][:current_path]}/wp-config.php"
