@@ -116,7 +116,7 @@ define :wordpress_deployment_localisation do
   end
 
   def deploy_cms_framework
-    Chef::Log.info "Caylent-Deploy: Checking for previous deployment"
+    Chef::Log.info "Caylent-Deploy: Checking for previous deployment by looking for #{node[:deploy][$application][:shared_content_folder]}/wp-content"
     
     deploy_action = "nothing"
     
