@@ -29,7 +29,7 @@ define :wordpress_deployment_localisation do
     Chef::Log.info "Caylent-deploy:Wordpress add copy from #{node[:deploy][$application][:current_path]}/wp-content"
     Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][$application][:shared_content_folder]}"
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content #{node[:deploy][$application][:shared_content_folder]}"
+      command "rsync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content/* #{node[:deploy][$application][:shared_content_folder]}"
       only_if { File.exists?("#{node[:deploy][$application][:current_path]}/wp-content")}
     end
     
