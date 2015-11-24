@@ -37,10 +37,10 @@ define :wordpress_deployment_localisation do
 
   def remove_current_symlink
     Chef::Log.info "Caylent-Deploy: Do Nothing"
-    #execute "remove and replace currentsymlink" do
-    #  command "rm #{node[:deploy][$application][:current_path]} && mkdir #{node[:deploy][$application][:current_path]}"
-    #  
-    #end
+    execute "remove and replace currentsymlink" do
+      command "rm #{node[:deploy][$application][:current_path]} && mkdir #{node[:deploy][$application][:current_path]} && chmod -R 777 #{node[:deploy][$application][:current_path]}"           
+    end
+    
   end
  
  
