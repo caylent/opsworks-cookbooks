@@ -25,14 +25,16 @@ define :docker_deployment_localisation do
         Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
         command = 'aws ecr get-login'
         command_out = shell_out(command)
-        node.set[:docker_login] = command_out.stdout
+        node.set[:deploy][application][:docker_login] = command_out.stdout
     end
     action :run
   end
 
+
+
   Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
   execute "ecr login" do
-    command "#{node[:docker_login]}"
+    command "#{node[:deploy][application][:docker_login]}"
   end
 
   Chef::Log.info "Attempting to pull image"
