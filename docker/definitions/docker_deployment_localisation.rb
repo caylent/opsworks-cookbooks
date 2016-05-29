@@ -26,6 +26,7 @@ define :docker_deployment_localisation do
         command = 'aws ecr get-login'
         command_out = shell_out(command)
         node.set[:deploy][application][:docker_login] = command_out.stdout
+        Chef::Log.info "docker_login cmd '#{command_out.stdout}'"
     end
     action :run
   end
