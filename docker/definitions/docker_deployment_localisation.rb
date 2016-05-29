@@ -1,15 +1,15 @@
 #===============================================================================#
-# FILE: docker_modify_local.rb
+# FILE: docker_deployment_localisation.rb
 #===============================================================================#
-# PURPOSE: Setup the application database configuration 
+# PURPOSE: Setup the application database configuration
 #===============================================================================#
 # STEPS TAKEN WHEN SETTING UP NODES:
 #   1. Check for environment variable if not empty run 2 and 3
 #   2. create symlink to nfs shared subfolder
-#===============================================================================# 
+#===============================================================================#
 
 # Better code would be to build command for execution later this could include adding additional env variable to container
-# Todo: Add logic forshared File storage 
+# Todo: Add logic forshared File storage
 # Todo Logic to allow more than one docker container for port 80
 
 define :docker_deployment_localisation do
@@ -22,41 +22,41 @@ define :docker_deployment_localisation do
     #ToDo: Add logic for none ecr repo
     block do
         #tricky way to load this Chef::Mixin::ShellOut utilities
-        Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)      
+        Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
         command = 'aws ecr get-login'
         command_out = shell_out(command)
         node.set['docker_login'] = command_out.stdout
-        Chef::log.info "Attempting to login to ecr with command #node[:docker_login]"
+        Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
         execute "ecr login" do
-          command "#node[:docker_login]"
+          command "#{node[:docker_login]}"
         end
     end
   end
 
-  Chef::log.info "Attempting to pull image"
-  execute "docker pull for #node[:deploy][application][:environment_variables][:docker_image]}:node[:deploy][application][:environment_variables][docker_version]"
-    command "docker pull #node[:deploy][application][:environment_variables][:docker_image]}:node[:deploy][application][:environment_variables][docker_version]"
+  Chef::Log.info "Attempting to pull image"
+  execute "docker pull for #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
+    command "docker pull #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
   end
-  
 
- if (node[:env] == "prod")
-  Chef::log.info "Caylent-Deploy: Dirty fix for first boot"
+
+ if (node[:deploy][:application_name][:environment_variables][:ENV] == "prod")
+  Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop old" do
-    command "docker run -p 80:80 -p 443:443 #node[:deploy][application][:environment_variables][:docker_image]}:#node[:deploy][application][:environment_variables][docker_version]"
+    command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
     ignore_failure true
   end
-Chef::log.info "Caylent-Deploy: Dirty fix for first boot"
+  Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop old" do
-    command "docker stop #node[:deploy][application][:environment_variables][docker_version] && docker run -n #node[:deploy][application][:environment_variables][docker_version] -p 80:80 -p 443:443 #node[:deploy][application][:environment_variables][:docker_image]}:#node[:deploy][application][:environment_variables][docker_version]"
-    ignore_failure true
+    command "docker stop #{node[:deploy][application][:environment_variables][docker_version]} && docker run -n #{node[:deploy][application][:environment_variables][docker_version]} -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
+    ignore_failure false
   end
  else
-  Chef::log.info "Caylent-Deploy: Docker stop"
+  Chef::Log.info "Caylent-Deploy: Docker stop"
   execute "stop old" do
-    command "docker stop #node[:deploy][application][:environment_variables][docker_version]"
+    command "docker stop #{node[:deploy][application][:environment_variables][docker_version]}"
     ignore_failure true
   end
-  
+
   if (node[:deploy][application][:environment_variables][:db_reload] == "1")
     Chef::Log.info "Caylent-Deploy: Attempting to run image with db reload"
     execute "copy docker framework" do
@@ -68,5 +68,5 @@ Chef::log.info "Caylent-Deploy: Dirty fix for first boot"
       command "docker run -p 80:80 -p 443:443 node[:deploy][application][:environment_variables][:docker_image]}:node[:deploy][application][:environment_variables][docker_version]"
     end
   end
-   
+
 end
