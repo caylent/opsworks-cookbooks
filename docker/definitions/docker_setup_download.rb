@@ -8,7 +8,7 @@
 #===============================================================================# 
 
 
-define docker_setup_download do
+define :docker_setup_download do
 
 Chef::Log.info "Caylent-setup: Running any script for docker setup"
 

@@ -34,7 +34,7 @@ define :docker_deployment_localisation do
   end
 
   Chef::Log.info "Attempting to pull image"
-  execute "docker pull for #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
+  execute "docker pull for #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}" do
     command "docker pull #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
   end
 
@@ -68,5 +68,7 @@ define :docker_deployment_localisation do
       command "docker run -p 80:80 -p 443:443 node[:deploy][application][:environment_variables][:docker_image]}:node[:deploy][application][:environment_variables][docker_version]"
     end
   end
+
+ end
 
 end
