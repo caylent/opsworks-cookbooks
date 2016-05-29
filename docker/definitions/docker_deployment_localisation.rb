@@ -22,12 +22,14 @@ define :docker_deployment_localisation do
     #ToDo: Add logic for none ecr repo
     block do
         #tricky way to load this Chef::Mixin::ShellOut utilities
-        Chef::Resource::RubyBlock.send(:include, Chef::Mixlib::ShellOut)
-        command = Chef::Mixlib::ShellOut.new('aws ecr get-login')
+        Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
+        command = 'aws ecr get-login'
         Chef::Log.info "aws cmd '#{command}'"
-        command.run_command
-        Chef::Log.info "shell out '#{command.stdout}'"
-        node.set[:deploy][application][:docker_login] = command.stdout
+        command_out = shell_out(command)
+        Chef::Log.info "shell out '#{command_out}'"
+        Chef::Log.info "docker_login cmd '#{command_out.stdout}'"
+        Chef::Log.info "docker_login cmd error '#{command_out.stderr}'"
+        node.set[:deploy][application][:docker_login] = command_out.stdout
     end
     action :run
   end
