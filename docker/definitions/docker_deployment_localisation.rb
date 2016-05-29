@@ -39,7 +39,7 @@ define :docker_deployment_localisation do
   end
 
 
- if (node[:deploy][:application_name][:environment_variables][:ENV] == "prod")
+ if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop old" do
     command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
