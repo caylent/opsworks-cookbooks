@@ -34,40 +34,41 @@ define :docker_deployment_localisation do
   end
 
   Chef::Log.info "Attempting to pull image"
-  execute "docker pull for #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}" do
-    command "docker pull #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
+  execute "docker pull for #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}" do
+    command "docker pull #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
   end
 
 
  if (node[:deploy][:application_name][:environment_variables][:ENV] == "prod")
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop old" do
-    command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
+    command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     ignore_failure true
   end
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop old" do
-    command "docker stop #{node[:deploy][application][:environment_variables][docker_version]} && docker run -n #{node[:deploy][application][:environment_variables][docker_version]} -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][docker_version]}"
+    command "docker stop #{node[:deploy][application][:environment_variables][:docker_version]} && docker run -n #{node[:deploy][application][:environment_variables][:docker_version]} -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     ignore_failure false
   end
  else
   Chef::Log.info "Caylent-Deploy: Docker stop"
   execute "stop old" do
-    command "docker stop #{node[:deploy][application][:environment_variables][docker_version]}"
+    command "docker stop #{node[:deploy][application][:environment_variables][:docker_version]}"
     ignore_failure true
   end
 
-  if (node[:deploy][application][:environment_variables][:db_reload] == "1")
-    Chef::Log.info "Caylent-Deploy: Attempting to run image with db reload"
-    execute "copy docker framework" do
-      command "docker run -e 'DBRELOAD=true' -p 80:80 -p 443:443 #node[:deploy][application][:environment_variables][:docker_image]}:#node[:deploy][application][:environment_variables][docker_version]"
-    end
-  else
+  # if (node[:deploy][application][:environment_variables][:db_reload] == "1")
+  #   Chef::Log.info "Caylent-Deploy: Attempting to run image with db reload"
+  #   execute "copy docker framework" do
+  #     command "docker run -e 'DBRELOAD=true' -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+  #   end
+  # else
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "copy docker framework" do
-      command "docker run -p 80:80 -p 443:443 node[:deploy][application][:environment_variables][:docker_image]}:node[:deploy][application][:environment_variables][docker_version]"
+      #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+      command "docker -run #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     end
-  end
+  # end
 
  end
 
