@@ -26,11 +26,13 @@ define :docker_deployment_localisation do
         command = 'aws ecr get-login'
         command_out = shell_out(command)
         node.set['docker_login'] = command_out.stdout
-        Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
-        execute "ecr login" do
-          command "#{node[:docker_login]}"
-        end
     end
+    action :run
+  end
+
+  Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
+  execute "ecr login" do
+    command "#{node[:docker_login]}"
   end
 
   Chef::Log.info "Attempting to pull image"
