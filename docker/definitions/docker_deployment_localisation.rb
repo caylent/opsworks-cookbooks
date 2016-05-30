@@ -23,6 +23,12 @@ define :docker_deployment_localisation do
     command "pip install awscli"
   end
 
+  Chef::Log.info "AWS env variables"
+  ENV['AWS_ACCESS_KEY_ID'] = node[:deploy][application][:environment_variables][:AWS_ACCESS_KEY_ID]
+  ENV['AWS_SECRET_ACCESS_KEY'] = node[:deploy][application][:environment_variables][:AWS_SECRET_ACCESS_KEY]
+  ENV['AWS_DEFAULT_REGION'] = node[:deploy][application][:environment_variables][:AWS_DEFAULT_REGION]
+
+
   ruby_block "docker login" do
     #ToDo: Add logic for none ecr repo
     block do
