@@ -66,7 +66,7 @@ define :docker_deployment_localisation do
  else
   Chef::Log.info "Caylent-Deploy: Docker stop"
   execute "stop old" do
-    command "docker stop #{node[:deploy][application][:environment_variables][:docker_version]}"
+    command "docker stop #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     ignore_failure true
   end
 
@@ -77,9 +77,9 @@ define :docker_deployment_localisation do
   #   end
   # else
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
-    execute "copy docker framework" do
+    execute "run image" do
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker -run #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+      command "docker run #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     end
   # end
 
