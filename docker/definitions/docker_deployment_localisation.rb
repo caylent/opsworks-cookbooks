@@ -18,6 +18,11 @@ define :docker_deployment_localisation do
 
   Chef::Log.info "Caylent-Deploy: Running docker localise for #{application}."
 
+  Chef::Log.info "Installing awscli using python-pip"
+  execute "pip install awscli" do
+    command "pip install awscli"
+  end
+
   ruby_block "docker login" do
     #ToDo: Add logic for none ecr repo
     block do
@@ -33,8 +38,6 @@ define :docker_deployment_localisation do
     end
     action :run
   end
-
-
 
   Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
   execute "ecr login" do
