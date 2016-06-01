@@ -79,7 +79,7 @@ define :docker_deployment_localisation do
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "run image" do
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker run #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+      command "docker run -d -p 80:80 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     end
   # end
 
