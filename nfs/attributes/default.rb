@@ -19,7 +19,7 @@ default[:opsworks][:nfs][:export_full_path] = "#{node[:opsworks][:nfs][:export_r
 
 
 #Generic shared path variable made avaiable by any caylent File Share tiers
-default[:opsworks][:fs_tier][:export_full_path] = node[:opsworks][:shared][:export_full_path]
+#default[:opsworks][:fs_tier][:export_full_path] = node[:opsworks][:shared][:export_full_path]
 ############################################################
 # nfs Deployment Attributes
 ############################################################
