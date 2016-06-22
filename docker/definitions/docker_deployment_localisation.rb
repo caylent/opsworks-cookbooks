@@ -55,7 +55,7 @@ define :docker_deployment_localisation do
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop old" do
-    command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+    command "docker run -p 80:80 --name #{node[:deploy][application][:environment_variables][:docker_version]} #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     ignore_failure true
   end
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
@@ -66,7 +66,7 @@ define :docker_deployment_localisation do
  else
   Chef::Log.info "Caylent-Deploy: Docker stop"
   execute "stop old" do
-    command "docker stop #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+    command "docker stop #{node[:deploy][application][:environment_variables][:docker_version]} && docker rename #{node[:deploy][application][:environment_variables][:docker_version]} #{node[:deploy][application][:environment_variables][:docker_version]}-old"
     ignore_failure true
   end
 
@@ -79,7 +79,7 @@ define :docker_deployment_localisation do
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "run image" do
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker run -d -p 80:80 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+      command "docker run -d -p 80:80 --name #{node[:deploy][application][:environment_variables][:docker_version]} #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     end
   # end
 
