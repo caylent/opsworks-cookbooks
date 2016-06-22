@@ -18,7 +18,7 @@ define :docker_deployment_localisation do
   docker_url = "#{node[:deploy][application][:environment_variables][:docker_repo_url]}"
   docker_application = "#{node[:deploy][application][:environment_variables][:docker_application]}"
   docker_version = "#{node[:deploy][application][:environment_variables][:docker_version]}"
-  docker_containerName = "#{application}-#{version}"
+  docker_containerName = "#{docker_application}-#{docker_version}"
 
 
   Chef::Log.info "Caylent-Deploy: Running docker localise for #{application}."
