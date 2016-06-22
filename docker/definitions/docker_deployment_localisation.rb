@@ -15,9 +15,9 @@
 define :docker_deployment_localisation do
 
   application = params[:application_name]
-  url = node[:deploy][application][:environment_variables][:docker_repo_url]
-  application = node[:deploy][application][:environment_variables][:docker_application]
-  version = node[:deploy][application][:environment_variables][:docker_version]
+  url = "#{node[:deploy][application][:environment_variables][:docker_repo_url]}"
+  application = "#{node[:deploy][application][:environment_variables][:docker_application]}"
+  version = "#{node[:deploy][application][:environment_variables][:docker_version]}"
   containerName = "#{application}-#{version}"
 
 
