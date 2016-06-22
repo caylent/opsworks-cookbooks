@@ -15,10 +15,10 @@
 define :docker_deployment_localisation do
 
   application = params[:application_name]
-  url = "#{node[:deploy][application][:environment_variables][:docker_repo_url]}"
-  application = "#{node[:deploy][application][:environment_variables][:docker_application]}"
-  version = "#{node[:deploy][application][:environment_variables][:docker_version]}"
-  containerName = "#{application}-#{version}"
+  docker_url = "#{node[:deploy][application][:environment_variables][:docker_repo_url]}"
+  docker_application = "#{node[:deploy][application][:environment_variables][:docker_application]}"
+  docker_version = "#{node[:deploy][application][:environment_variables][:docker_version]}"
+  docker_containerName = "#{application}-#{version}"
 
 
   Chef::Log.info "Caylent-Deploy: Running docker localise for #{application}."
@@ -52,26 +52,26 @@ define :docker_deployment_localisation do
   end
 
   Chef::Log.info "Attempting to pull image"
-  execute "docker pull for #{url}/#{application}:#{version}" do 
-    command "docker pull #{url}/#{application}:#{version}"
+  execute "docker pull for #{docker_url}/#{docker_application}:#{docker_version}" do 
+    command "docker pull #{docker_url}/#{docker_application}:#{docker_version}"
   end
 
 
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "dirty-start" do
-    command "docker run -p 80:80 --name #{containerName} #{url}/#{application}:#{version}"
+    command "docker run -p 80:80 --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     ignore_failure true
   end
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "stop,rename old, start new" do
-    command "docker stop #{containerName} && docker rename #{containerName}-old && docker run -d -p 80:80 --name #{containerName} #{url}/#{application}:#{version}"
+    command "docker stop #{docker_containerName} && docker rename #{docker_containerName}-old && docker run -d -p 80:80 --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     ignore_failure false
   end
  else
   Chef::Log.info "Caylent-Deploy: Docker stop"
   execute "stop old" do
-    command "docker stop #{containerName} && docker rename #{containerName}-old"
+    command "docker stop #{docker_containerName} && docker rename #{docker_containerName}-old"
     ignore_failure true
   end
 
@@ -84,7 +84,7 @@ define :docker_deployment_localisation do
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "run image" do
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker run -d -p 80:80 --name #{containerName} #{url}/#{application}:#{version}"
+      command "docker run -d -p 80:80 --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     end
   # end
 
