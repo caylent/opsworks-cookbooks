@@ -46,7 +46,8 @@ define :docker_deployment_localisation do
         #tricky way to load this Chef::Mixin::ShellOut utilities
         Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
         command = 'aws ecr get-login'
-        node.default[:deploy][application][:docker_login] = shell_out(command)
+        command_out = shell_out(command)
+        node.default[:deploy][application][:docker_login] = command_out.stdout
         notifies :run, 'execute[docker-login]', :immediately
     end
     action :run
