@@ -36,11 +36,6 @@ define :docker_deployment_localisation do
   ENV['AWS_SECRET_ACCESS_KEY'] = node[:deploy][application][:environment_variables][:AWS_SECRET_ACCESS_KEY]
   ENV['AWS_DEFAULT_REGION'] = node[:deploy][application][:environment_variables][:AWS_DEFAULT_REGION]
   
-  execute "docker-login" do
-    command lazy { "#{node[:deploy][application][:docker_login]}" }
-    action :nothing
-  end
-
   ruby_block "docker login" do
     block do
         #tricky way to load this Chef::Mixin::ShellOut utilities
@@ -59,6 +54,10 @@ define :docker_deployment_localisation do
  end
 
   Chef::Log.info "Attempting to login to #{docker_repo_type} with command #{node[:deploy][application][:docker_login]}"
+
+  execute "docker-login" do
+    command lazy { "#{node[:deploy][application][:docker_login]}" }
+  end
 
   Chef::Log.info "Attempting to pull image"
   execute "docker pull for #{docker_url}/#{docker_application}:#{docker_version}" do 
