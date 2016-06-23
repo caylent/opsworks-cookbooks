@@ -48,7 +48,9 @@ define :docker_deployment_localisation do
         command = 'aws ecr get-login'
         command_out = shell_out(command)
         node.default[:deploy][application][:docker_login] = command_out.stdout
-        notifies :run, 'execute[docker-login]', :immediately
+
+        Chef::Log.info "Arg:Attempting to login to #{docker_repo_type} with command #{node[:deploy][application][:docker_login]}"
+        #notifies :run, 'execute[docker-login]', :immediately
     end
     action :run
   end
@@ -56,7 +58,7 @@ define :docker_deployment_localisation do
      node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password} #{docker_url}/#{docker_application}:#{docker_version}"
  end
 
-  Chef::Log.info "Hi:Attempting to login to #{docker_repo_type} with command #{node[:deploy][application][:docker_login]}"
+  Chef::Log.info "Attempting to login to #{docker_repo_type} with command #{node[:deploy][application][:docker_login]}"
 
   Chef::Log.info "Attempting to pull image"
   execute "docker pull for #{docker_url}/#{docker_application}:#{docker_version}" do 
