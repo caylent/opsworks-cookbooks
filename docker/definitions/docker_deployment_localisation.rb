@@ -53,6 +53,7 @@ define :docker_deployment_localisation do
   Chef::Log.info "Attempting to login to #{docker_repo_type} with command #{node[:deploy][application][:docker_login]}"
   execute "docker-login" do
     command lazy { "#{node[:deploy][application][:docker_login]}" }
+    action :nothing
   end
 
   Chef::Log.info "Attempting to pull image"
