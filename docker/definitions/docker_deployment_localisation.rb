@@ -71,7 +71,7 @@ define :docker_deployment_localisation do
  else
   Chef::Log.info "Caylent-Deploy: Docker stop"
   execute "stop old" do
-    command "docker stop #{docker_containerName} && docker rename #{docker_containerName} #{docker_containerName}-old"
+    command "docker rmi #{docker_containerName}-old; docker stop #{docker_containerName} && docker rename #{docker_containerName} #{docker_containerName}-old"
     ignore_failure true
   end
 
