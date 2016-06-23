@@ -19,7 +19,7 @@ define :docker_deployment_localisation do
   docker_application = "#{node[:deploy][application][:environment_variables][:docker_application]}"
   docker_version = "#{node[:deploy][application][:environment_variables][:docker_version]}"
   docker_containerName = "#{docker_application}-#{docker_version}"
-
+  docker_repo_type = "#{node[:deploy][application][:environment_variables][:docker_repo_type]}"
 
   Chef::Log.info "Caylent-Deploy: Running docker localise for #{application}."
 
@@ -28,27 +28,30 @@ define :docker_deployment_localisation do
     command "pip install awscli"
   end
 
+ case docker_repo_type
+ when 'ecr'
+
   Chef::Log.info "AWS env variables"
   ENV['AWS_ACCESS_KEY_ID'] = node[:deploy][application][:environment_variables][:AWS_ACCESS_KEY_ID]
   ENV['AWS_SECRET_ACCESS_KEY'] = node[:deploy][application][:environment_variables][:AWS_SECRET_ACCESS_KEY]
   ENV['AWS_DEFAULT_REGION'] = node[:deploy][application][:environment_variables][:AWS_DEFAULT_REGION]
-
-
+  
   ruby_block "docker login" do
-    #ToDo: Add logic for none ecr repo
     block do
         #tricky way to load this Chef::Mixin::ShellOut utilities
         Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
         command = 'aws ecr get-login'
-        command_out = shell_out(command)
-        node.default[:deploy][application][:docker_login] = command_out.stdout
+        node.default[:deploy][application][:docker_login] = shell_out(command)
     end
     action :run
   end
+ when 'docker', 'gcr', 'quay'
+     node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password} #{docker_url}/#{docker_application}:#{docker_version}"
+ end
 
   Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
   execute "ecr login" do
-    command lazy { "#{node[:deploy][application][:docker_login]}" }
+    command lazy { "#{node.default[:deploy][application][:docker_login]}" }
   end
 
   Chef::Log.info "Attempting to pull image"
