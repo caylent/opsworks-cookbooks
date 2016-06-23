@@ -50,7 +50,7 @@ define :docker_deployment_localisation do
  end
 
   Chef::Log.info "Attempting to login to ecr with command #node[:docker_login]"
-  execute "ecr login" do
+  execute "docker login" do
     command lazy { "#{node.default[:deploy][application][:docker_login]}" }
   end
 
