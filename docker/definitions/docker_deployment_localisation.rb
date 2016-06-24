@@ -52,7 +52,7 @@ define :docker_deployment_localisation do
     end
     action :run
   end
-when 'docker', 'gcr', 'quay'
+ when 'docker', 'gcr', 'quay'
     if !docker_username.empty? && !docker_email.empty?
      node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password} -e #{docker_email}"
     else
