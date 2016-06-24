@@ -22,6 +22,7 @@ define :docker_deployment_localisation do
   docker_repo_type = "#{node[:deploy][application][:environment_variables][:docker_repo_type]}"
   docker_username = "#{node[:deploy][application][:environment_variables][:docker_username]}"
   docker_password = "#{node[:deploy][application][:environment_variables][:docker_password]}"
+  docker_email = "#{node[:deploy][application][:environment_variables][:docker_email]}"
 
   Chef::Log.info "Caylent-Deploy: Running docker localise for #{application}."
 
@@ -52,8 +53,10 @@ define :docker_deployment_localisation do
     action :run
   end
 when 'docker', 'gcr', 'quay'
-    if !docker_username.empty?
-     node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password} #{docker_url}/#{docker_application}:#{docker_version}"
+    if !docker_username.empty? && !docker_email.empty?
+     node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password} -e #{docker_email}"
+    else
+     node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password}"
     end
  end
 
