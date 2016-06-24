@@ -52,13 +52,13 @@ define :docker_deployment_localisation do
     action :run
   end
 when 'docker', 'gcr', 'quay'
-    if !docker_username.nil? || !docker.empty?
+    if !docker.empty?
      node.default[:deploy][application][:docker_login] = "docker login -u #{docker_username} -p #{docker_password} #{docker_url}/#{docker_application}:#{docker_version}"
     end
  end
 
   Chef::Log.info "Attempting to login to #{docker_repo_type} with command #{node[:deploy][application][:docker_login]}"
-  if !docker_login.nil? || !docker.empty?
+  if !docker.empty?
     execute "docker-login" do
       command lazy { "#{node[:deploy][application][:docker_login]}" }
     end
