@@ -10,7 +10,7 @@
 #===============================================================================# 
 
 
-define wordpress_setup_download do
+define :wordpress_setup_download do
 
   if !File.exists?("/tmp/wordpress-#{node[:opsworks][:wordpress][:version]}.tar.gz")
       

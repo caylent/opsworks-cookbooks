@@ -17,6 +17,9 @@ default[:opsworks][:nfs][:export_root] = "/export"
 default[:opsworks][:nfs][:export_folder] = "/caylent-nfs"
 default[:opsworks][:nfs][:export_full_path] = "#{node[:opsworks][:nfs][:export_root]}#{node[:opsworks][:nfs][:export_folder]}"
 
+
+#Generic shared path variable made avaiable by any caylent File Share tiers
+#default[:opsworks][:fs_tier][:export_full_path] = node[:opsworks][:shared][:export_full_path]
 ############################################################
 # nfs Deployment Attributes
 ############################################################
