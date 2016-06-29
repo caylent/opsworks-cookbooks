@@ -32,11 +32,11 @@
       creates "#{node[:opsworks][:nfs][:export_full_path]}"
     end
        
-   grep_results_size = File.readlines("/etc/fstab").grep(/caylent-nfs-exports/).size
-   grep_results = File.readlines("/etc/fstab").grep(/caylent-nfs-exports/)
+   grep_results_size = File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size
+   grep_results = File.readlines("/etc/exports").grep(/caylent-nfs-exports/)
    Chef::Log.info "Caylent-Setup:THe size of the grep query: #{grep_results_size}. It's actual results #{grep_results}"
        
-    if (File.exists?("/etc/exports") && File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size < 1) #ToDo improve check and update
+    if (File.exists?("/etc/exports") && File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size == 0) #ToDo improve check and update
       
       Chef::Log.info "Caylent-Setup: No entry found in the /etc/exports adding them now"
       execute 'add export root to exports file' do
