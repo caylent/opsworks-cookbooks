@@ -44,11 +44,11 @@
       end
      
       execute 'add export root to exports file' do
-        command "echo '#{node[:opsworks][:nfs][:export_root]} 172.31.0.0/16(rw,fsid=0,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
+        command "echo '#{node[:opsworks][:nfs][:export_root]} #{node[:opsworks][:nfs][:network_cidr]}(rw,fsid=0,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
       end
       
       execute 'add export full path to exports file' do
-        command "echo '#{node[:opsworks][:nfs][:export_full_path]} 172.31.0.0/16(rw,nohide,insecure,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
+        command "echo '#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:network_cidr]}(rw,nohide,insecure,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
       end
       
       execute 'restart nfs kernal' do

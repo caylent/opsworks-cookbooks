@@ -24,4 +24,9 @@ default[:opsworks][:nfs][:export_full_path] = "#{node[:opsworks][:nfs][:export_r
 # nfs Deployment Attributes
 ############################################################
 
-
+  if (node[:deploy][application][:environment_variables][:network_cidr] == nil)
+    Chef::Log.warn "Caylent-Deploy:No network_cidr set using default 10.0.0.0/16"
+    default[:opsworks][:nfs][:network_cidr] = "10.0.0.0/16"
+  else
+     default[:opsworks][:nfs][:network_cidr] = node[:deploy][application][:environment_variables][:network_cidr]
+  end
