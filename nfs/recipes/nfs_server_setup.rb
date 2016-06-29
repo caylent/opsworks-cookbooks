@@ -34,7 +34,7 @@
        
    grep_results_size = File.readlines("/etc/fstab").grep(/caylent-nfs-exports/).size
    grep_results = File.readlines("/etc/fstab").grep(/caylent-nfs-exports/)
-   Chef::Log.info "Wizkru-Setup:THe size of the grep query: #{grep_results_size}. It's actual results #{grep_results}"
+   Chef::Log.info "Caylent-Setup:THe size of the grep query: #{grep_results_size}. It's actual results #{grep_results}"
        
     if (File.exists?("/etc/exports") && File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size < 1) #ToDo improve check and update
       
