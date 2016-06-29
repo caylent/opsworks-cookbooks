@@ -13,54 +13,55 @@
 #
 #===============================================================================# 
  
- package 'Install nfs-kernel-server' do 
-    case node[:platform]
-    when 'ubuntu', 'debian' #ToDo extend to other platforms
-      package_name 'nfs-kernel-server'
+    package 'Install nfs-kernel-server' do 
+        case node[:platform]
+        when 'ubuntu', 'debian' #ToDo extend to other platforms
+          package_name 'nfs-kernel-server'
+        end
+        notifies :create, 'ruby_block[folder setup]', :immediately
     end
-  end
- 
-   Chef::Log.info "Caylent-Setup: Create export root folder #{node[:opsworks][:nfs][:export_root]}"
-    execute "create export root folder" do 
-      command "mkdir #{node[:opsworks][:nfs][:export_root]}"
-      creates "#{node[:opsworks][:nfs][:export_root]}"
-    end
-    
-    Chef::Log.info "Caylent-Setup: Create export folder #{node[:opsworks][:nfs][:export_full_path]}"
-    execute "create export folder" do 
-      command "mkdir #{node[:opsworks][:nfs][:export_full_path]}"
-      creates "#{node[:opsworks][:nfs][:export_full_path]}"
+
+    ruby_block "folder setup" do
+        block do
+            Chef::Log.info "Caylent-Setup: Create export root folder #{node[:opsworks][:nfs][:export_root]}"
+            execute "create export root folder" do 
+              command "mkdir #{node[:opsworks][:nfs][:export_root]}"
+              creates "#{node[:opsworks][:nfs][:export_root]}"
+            end
+            
+            Chef::Log.info "Caylent-Setup: Create export folder #{node[:opsworks][:nfs][:export_full_path]}"
+            execute "create export folder" do 
+              command "mkdir #{node[:opsworks][:nfs][:export_full_path]}"
+              creates "#{node[:opsworks][:nfs][:export_full_path]}"
+            end
+        end
+        action :nothing
+        notifies :create, 'ruby_block[add details to /etc/exports]', :immediately
     end
    
-   Chef::Log.info "Caylent-Setup: Create /etc/exports folder"
-   execute "create /etc/exports" do
-       command "touch /etc/exports"
-       creates "/etc/exports"
-       action :run
-   end
-
-   #grep_results_size = File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size
-   #grep_results = File.readlines("/etc/exports").grep(/caylent-nfs-exports/)
    #Chef::Log.info "Caylent-Setup:THe size of the grep query: #{grep_results_size}. It's actual results #{grep_results}"
 
        
-    if (File.exists?("/etc/exports") && File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size == 0) #ToDo improve check and update
-      
-      Chef::Log.info "Caylent-Setup: No entry found in the /etc/exports adding them now"
-      execute 'add export root to exports file' do
-        command 'echo "#caylent-nfs-exports" >> /etc/exports'
-      end
+    ruby_block "add details to /etc/exports" do
+        block do
+            Chef::Log.info "Caylent-Setup: No entry found in the /etc/exports adding them now"
+            execute 'add export root to exports file' do
+              command 'echo "#caylent-nfs-exports" >> /etc/exports'
+            end
      
-      execute 'add export root to exports file' do
-        command "echo '#{node[:opsworks][:nfs][:export_root]} #{node[:opsworks][:nfs][:network_cidr]}(rw,fsid=0,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
-      end
-      
-      execute 'add export full path to exports file' do
-        command "echo '#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:network_cidr]}(rw,nohide,insecure,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
-      end
-      
-      execute 'restart nfs kernal' do
-        command 'service nfs-kernel-server restart && service idmapd restart'
-      end
+            execute 'add export root to exports file' do
+              command "echo '#{node[:opsworks][:nfs][:export_root]} #{node[:opsworks][:nfs][:network_cidr]}(rw,fsid=0,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
+            end
+            
+            execute 'add export full path to exports file' do
+              command "echo '#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:network_cidr]}(rw,nohide,insecure,no_subtree_check,sync)' >> /etc/exports" #ToDo Replace fixed subnet masks with dynamic from stack
+            end
+            
+            execute 'restart nfs kernal' do
+              command 'service nfs-kernel-server restart && service idmapd restart'
+            end
+        end
+        not_if {File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size == 1}
+        action :nothing
     end
 
