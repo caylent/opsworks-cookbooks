@@ -16,9 +16,10 @@ define :wordpress_deployment_localisation do
   
   if node[:opsworks][:layers].include?("nfs")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
-    default[:deploy][application][:shared_content_folder] = "#{node[:opsworks][:nfs][:export_full_path]}/#{application}"
+    sharedPath = "#{node[:opsworks][:nfs][:export_full_path]}/#{application}"
   else
     Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
+    sharedPath = node[:deploy][application][:shared_content_folder] 
   end
   
   
@@ -27,9 +28,9 @@ define :wordpress_deployment_localisation do
   #===================================
   def add_wpcontent
     Chef::Log.info "Caylent-deploy:Wordpress add copy from #{node[:deploy][application][:current_path]}/wp-content"
-    Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][application][:shared_content_folder]}"
+    Chef::Log.info "Caylent-deploy:Wordpress add copy to #{sharedPath}"
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content/* #{node[:deploy][application][:shared_content_folder]}"
+      command "rsync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}"
       only_if { File.exists?("#{node[:deploy][application][:current_path]}/wp-content")}
     end
     
@@ -80,14 +81,14 @@ define :wordpress_deployment_localisation do
   def update_wpcontent
 
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content/* #{node[:deploy][application][:shared_content_folder]}"
+      command "rsync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}"
     end    
   end
 
   def overwrite_wpcontent
 
     execute "copy wordpress framework" do
-      command "cp -R #{node[:deploy][application][:current_path]}/wp-content/* #{node[:deploy][application][:shared_content_folder]}"
+      command "cp -R #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}"
     end    
   end
 
@@ -116,21 +117,21 @@ define :wordpress_deployment_localisation do
   end
 
   def deploy_cms_framework
-    Chef::Log.info "Caylent-Deploy: Checking for previous deployment by looking for #{node[:deploy][application][:shared_content_folder]}/wp-content"
+    Chef::Log.info "Caylent-Deploy: Checking for previous deployment by looking for #{sharedPath}/wp-content"
     
     deploy_action = "nothing"
     
-    if (!File.exists?("#{node[:deploy][application][:shared_content_folder]}"))
+    if (!File.exists?("#{sharedPath}"))
       Chef::Log.info "Caylent-Deploy:No previous version found on share"
       deploy_action = "add"
     end
     
-    if (File.exists?("#{node[:deploy][application][:shared_content_folder]}") && !node[:opsworks][:cms_framework][:overwite])
+    if (File.exists?("#{sharedPath}") && !node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
       deploy_action = "update"
     end
     
-    if (File.exists?("#{node[:deploy][application][:shared_content_folder]}") && node[:opsworks][:cms_framework][:overwite])
+    if (File.exists?("#{sharedPath}") && node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
       deploy_action = "overwrite"
     end
