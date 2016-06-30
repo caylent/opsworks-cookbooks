@@ -13,10 +13,10 @@ node[:deploy].each do |application, deploy|
   
   
   # ToDo Update this to better reflect purpose of standardised test url for ELB
-  Chef::Log.info "Caylent-deploy:Testing for required info.php file in web root"
-  if !File.exists?("#{node[:deploy][application][:current_path]}/info.php")
-    Chef::Log.error "Caylent-deploy:No #{node[:deploy][application][:current_path]}/info.php file. This is needed for the load balancer. Please check it is added to repo"
-  end
+  #Chef::Log.info "Caylent-deploy:Testing for required info.php file in web root"
+  #if !File.exists?("#{node[:deploy][application][:current_path]}/info.php")
+  #  Chef::Log.error "Caylent-deploy:No #{node[:deploy][application][:current_path]}/info.php file. This is needed for the load balancer. Please check it is added to repo"
+  #end
   
   Chef::Log.info "Caylent-deploy:Deploying a wordpress app"   
   wordpress_deployment_localisation do

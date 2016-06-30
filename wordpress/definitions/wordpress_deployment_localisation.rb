@@ -10,13 +10,13 @@
 
 define :wordpress_deployment_localisation do
 
-  $application = params[:application_name]
+  application = params[:application_name]
   
-  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{$application}."
+  Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{application}."
   
   if node[:opsworks][:layers].include?("nfs")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
-    node[:deploy][$application][:shared_content_folder] = "#{node[:opsworks][:nfs][:export_full_path]}/#{$application}"
+    node[:deploy][application][:shared_content_folder] = "#{node[:opsworks][:nfs][:export_full_path]}/#{application}"
   else
     Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
   end
@@ -26,11 +26,11 @@ define :wordpress_deployment_localisation do
   # copies files to the shared folder
   #===================================
   def add_wpcontent
-    Chef::Log.info "Caylent-deploy:Wordpress add copy from #{node[:deploy][$application][:current_path]}/wp-content"
-    Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][$application][:shared_content_folder]}"
+    Chef::Log.info "Caylent-deploy:Wordpress add copy from #{node[:deploy][application][:current_path]}/wp-content"
+    Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][application][:shared_content_folder]}"
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress #{node[:deploy][$application][:current_path]}/wp-content/* #{node[:deploy][$application][:shared_content_folder]}"
-      only_if { File.exists?("#{node[:deploy][$application][:current_path]}/wp-content")}
+      command "rsync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content/* #{node[:deploy][application][:shared_content_folder]}"
+      only_if { File.exists?("#{node[:deploy][application][:current_path]}/wp-content")}
     end
     
   end
@@ -38,11 +38,11 @@ define :wordpress_deployment_localisation do
   def remove_current_symlink
     Chef::Log.info "Caylent-Deploy: Do Nothing"
     execute "remove and replace currentsymlink" do
-      command "rm #{node[:deploy][$application][:current_path]}"           #ToDo Current needs to be a symlink
+      command "rm #{node[:deploy][application][:current_path]}"           #ToDo Current needs to be a symlink
     end
     
-    link "#{node[:deploy][$application][:current_path]}" do
-      to "#{node[:deploy][$application][:deploy_to]}/core_framwork"
+    link "#{node[:deploy][application][:current_path]}" do
+      to "#{node[:deploy][application][:deploy_to]}/core_framwork"
       link_type :symbolic
       owner "deploy"
       group "www-data"
@@ -56,23 +56,23 @@ define :wordpress_deployment_localisation do
 
   def setup_wordpress_framework
 
-    directory "#{node[:deploy][$application][:deploy_to]}/core_framwork/" do
+    directory "#{node[:deploy][application][:deploy_to]}/core_framwork/" do
       owner 'deploy'
       group 'www-data'
       mode '775'
     end
     
-    Chef::Log.info "Caylent-Deploy: Running command cp /tmp/wordpress/* #{node[:deploy][$application][:current_path]}/"
+    Chef::Log.info "Caylent-Deploy: Running command cp /tmp/wordpress/* #{node[:deploy][application][:current_path]}/"
     execute "copy wordpress framework" do
-      command "cp -r /tmp/wordpress/* #{node[:deploy][$application][:deploy_to]}/core_framwork/"
+      command "cp -r /tmp/wordpress/* #{node[:deploy][application][:deploy_to]}/core_framwork/"
     end
     
-    Chef::Log.info "Caylent-Deploy:Creating wp-config.php file in #{node[:deploy][$application][:current_path]}/wp-config.php"
-    template "#{node[:deploy][$application][:current_path]}/wp-config.php" do
+    Chef::Log.info "Caylent-Deploy:Creating wp-config.php file in #{node[:deploy][application][:current_path]}/wp-config.php"
+    template "#{node[:deploy][application][:current_path]}/wp-config.php" do
       source "wp-config.php.erb"
       owner "root"
       mode 0644
-      variables ({:application => node[:deploy][$application]})
+      variables ({:application => node[:deploy][application]})
     end
   end
 
@@ -80,21 +80,21 @@ define :wordpress_deployment_localisation do
   def update_wpcontent
 
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress -u #{node[:deploy][$application][:current_path]}/wp-content/* #{node[:deploy][$application][:shared_content_folder]}"
+      command "rsync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content/* #{node[:deploy][application][:shared_content_folder]}"
     end    
   end
 
   def overwrite_wpcontent
 
     execute "copy wordpress framework" do
-      command "cp -R #{node[:deploy][$application][:current_path]}/wp-content/* #{node[:deploy][$application][:shared_content_folder]}"
+      command "cp -R #{node[:deploy][application][:current_path]}/wp-content/* #{node[:deploy][application][:shared_content_folder]}"
     end    
   end
 
   def link_wpcontent
 
-    link "#{node[:deploy][$application][:current_path]}/wp-content" do
-      to "#{node[:deploy][$application][:shared_content_folder]}"
+    link "#{node[:deploy][application][:current_path]}/wp-content" do
+      to "#{node[:deploy][application][:shared_content_folder]}"
       link_type :symbolic
       owner "deploy"
       group "www-data"
@@ -107,30 +107,30 @@ define :wordpress_deployment_localisation do
     Chef::Log.info "Caylent-Deploy: Running command chown -R deploy:www-data ./"
     execute "owner" do
       command "chown -R deploy:www-data ./"
-      cwd "#{node[:deploy][$application][:current_path]}/"
+      cwd "#{node[:deploy][application][:current_path]}/"
     end
     
     execute "change permissions on wordpress framework" do
-      command "chmod -R 775 #{node[:deploy][$application][:current_path]}"
+      command "chmod -R 775 #{node[:deploy][application][:current_path]}"
     end
   end
 
   def deploy_cms_framework
-    Chef::Log.info "Caylent-Deploy: Checking for previous deployment by looking for #{node[:deploy][$application][:shared_content_folder]}/wp-content"
+    Chef::Log.info "Caylent-Deploy: Checking for previous deployment by looking for #{node[:deploy][application][:shared_content_folder]}/wp-content"
     
     deploy_action = "nothing"
     
-    if (!File.exists?("#{node[:deploy][$application][:shared_content_folder]}"))
+    if (!File.exists?("#{node[:deploy][application][:shared_content_folder]}"))
       Chef::Log.info "Caylent-Deploy:No previous version found on share"
       deploy_action = "add"
     end
     
-    if (File.exists?("#{node[:deploy][$application][:shared_content_folder]}") && !node[:opsworks][:cms_framework][:overwite])
+    if (File.exists?("#{node[:deploy][application][:shared_content_folder]}") && !node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share updating application"
       deploy_action = "update"
     end
     
-    if (File.exists?("#{node[:deploy][$application][:shared_content_folder]}") && node[:opsworks][:cms_framework][:overwite])
+    if (File.exists?("#{node[:deploy][application][:shared_content_folder]}") && node[:opsworks][:cms_framework][:overwite])
       Chef::Log.info "Caylent-Deploy:Previous version found on share and overwrite variable is set"
       deploy_action = "overwrite"
     end
