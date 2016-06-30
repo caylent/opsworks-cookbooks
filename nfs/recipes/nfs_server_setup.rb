@@ -34,7 +34,7 @@
        
     Chef::Log.info "Caylent-Setup: No entry found in the /etc/exports adding them now"
     execute 'add details to /etc/exports' do
-        command "echo '# Caylent Nfs Exports caylent-nfs-exports' >> /etc/exports && echo '#{node[:opsworks][:nfs][:export_root]} #{node[:opsworks][:nfs][:network_cidr]}(rw,fsid=0,no_subtree_check,sync)' >> /etc/exports && echo '#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:network_cidr]}(rw,nohide,insecure,no_subtree_check,sync)' >> /etc/exports"
+        command "echo '# Caylent Nfs Exports caylent-nfs-exports' >> /etc/exports && echo '#{node[:opsworks][:nfs][:export_root]} #{node[:opsworks][:nfs][:network_cidr]}(rw,fsid=0,no_subtree_check,sync)' >> /etc/exports && echo '#{node[:opsworks][:nfs][:export_full_path]} #{node[:opsworks][:nfs][:network_cidr]}(rw,nohide,insecure,no_subtree_check,sync)' >> /etc/exports && service nfs-kernel-server restart"
         not_if {File.readlines("/etc/exports").grep(/caylent-nfs-exports/).size == 1}
         action :nothing
     end
