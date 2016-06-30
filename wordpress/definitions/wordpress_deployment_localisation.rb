@@ -14,9 +14,9 @@ define :wordpress_deployment_localisation do
   
   Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{$application}."
   
-  if node[:opsworks][:layers].include?("fs-tier")
+  if node[:opsworks][:layers].include?("nfs")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
-    node[:deploy][$application][:shared_content_folder] = "#{node[:opsworks][:fs_tier][:export_full_path]}/#{$application}"
+    node[:deploy][$application][:shared_content_folder] = "#{node[:opsworks][:nfs][:export_full_path]}/#{$application}"
   else
     Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
   end

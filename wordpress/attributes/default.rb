@@ -20,7 +20,7 @@ default[:opsworks][:wordpress][:version] = "4.3.1"
 node[:deploy].each do |application, deploy|
 
   if (node[:deploy][application][:environment_variables][:wp_prefix] == nil)
-    Chef::Log.warn "Wizkru-Deploy:No wp_prefix set using default wp_"
+    Chef::Log.warn "Caylent-Deploy:No wp_prefix set using default wp_"
     default[:deploy][application][:wp_prefix] = "wp_"
   else
     default[:deploy][application][:wp_prefix] = node[:deploy][application][:environment_variables][:wp_prefix]
