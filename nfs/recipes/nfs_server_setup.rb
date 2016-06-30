@@ -18,7 +18,7 @@
         when 'ubuntu', 'debian' #ToDo extend to other platforms
           package_name 'nfs-kernel-server'
         end
-        notifies :create, 'execute[folder setup]', :immediately
+        notifies :run, 'execute[folder setup]', :immediately
     end
 
     Chef::Log.info "Caylent-Setup: Create export root folder #{node[:opsworks][:nfs][:export_root]}"
@@ -26,7 +26,7 @@
         command "mkdir #{node[:opsworks][:nfs][:export_root]} && mkdir #{node[:opsworks][:nfs][:export_full_path]}"
         creates "#{node[:opsworks][:nfs][:export_root]}"
         action :nothing
-        notifies :create, 'execute[add details to /etc/exports]', :immediately
+        notifies :run, 'execute[add details to /etc/exports]', :immediately
     end
             
    #Chef::Log.info "Caylent-Setup:THe size of the grep query: #{grep_results_size}. It's actual results #{grep_results}"
