@@ -16,7 +16,7 @@ define :wordpress_deployment_localisation do
   
   if node[:opsworks][:layers].include?("nfs")
     Chef::Log.info "Caylent-Deploy: This stack contains a fs-teir"
-    sharedPath = "#{node[:opsworks][:nfs][:export_full_path]}/#{application}"
+    sharedPath = "#{node[:opsworks][:nfs][:mount_folder]}/#{application}"
   else
     Chef::Log.info "Caylent-Deploy:No fs_teir found, simulating fs share on local"
     sharedPath = node[:deploy][application][:shared_content_folder] 
