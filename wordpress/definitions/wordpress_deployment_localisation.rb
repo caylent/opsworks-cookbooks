@@ -27,8 +27,8 @@ define :wordpress_deployment_localisation do
   # copies files to the shared folder
   #===================================
   def add_wpcontent(sharedPath, application)
-    Chef::Log.info "Caylent-deploy:Wordpress add copy from #{node[:deploy][application][:current_path]}/wp-content"
-    Chef::Log.info "Caylent-deploy:Wordpress add copy to #{node[:deploy][application][:shared_content_folder]}"
+    Chef::Log.info "Caylent-deploy.add_wpcontent:Wordpress add copy from #{node[:deploy][application][:current_path]}/wp-content"
+    Chef::Log.info "Caylent-deploy.add_wpcontent:Wordpress add copy to #{node[:deploy][application][:shared_content_folder]}"
     execute "copy wordpress framework" do
       command "rsync --recursive --compress #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}"
       only_if { File.exists?("#{node[:deploy][application][:current_path]}/wp-content")}
@@ -37,11 +37,12 @@ define :wordpress_deployment_localisation do
   end
 
   def remove_current_symlink(application)
-    Chef::Log.info "Caylent-Deploy: Do Nothing"
+    Chef::Log.info "Caylent-Deploy.remove_current_symlink: Remove symlink #{node[:deploy][application][:current_path]}"
     execute "remove and replace currentsymlink" do
       command "rm #{node[:deploy][application][:current_path]}"           #ToDo Current needs to be a symlink
     end
-    
+   
+    Chef::Log.info "Caylent-Deploy: Symlink #{node[:deploy][application][:current_path]} to #{node[:deploy][application][:deploy_to]}/core_framwork"
     link "#{node[:deploy][application][:current_path]}" do
       to "#{node[:deploy][application][:deploy_to]}/core_framwork"
       link_type :symbolic
@@ -63,12 +64,13 @@ define :wordpress_deployment_localisation do
       mode '775'
     end
     
-    Chef::Log.info "Caylent-Deploy: Running command cp /tmp/wordpress/* #{node[:deploy][application][:current_path]}/"
+    cpCommand = "cp -r /tmp/wordpress/* #{node[:deploy][application][:deploy_to]}/core_framwork/"
+    Chef::Log.info "Caylent-Deploy.setup_wordpress_framework: Running command '#{cpCommand}"
     execute "copy wordpress framework" do
-      command "cp -r /tmp/wordpress/* #{node[:deploy][application][:deploy_to]}/core_framwork/"
+      command "cpCommand"
     end
     
-    Chef::Log.info "Caylent-Deploy:Creating wp-config.php file in #{node[:deploy][application][:current_path]}/wp-config.php"
+    Chef::Log.info "Caylent-Deploy.setup_wordpress_framework:Creating file #{node[:deploy][application][:current_path]}/wp-config.php"
     template "#{node[:deploy][application][:current_path]}/wp-config.php" do
       source "wp-config.php.erb"
       owner "root"
@@ -80,22 +82,29 @@ define :wordpress_deployment_localisation do
 
   def update_wpcontent(sharedPath, application)
 
+    syncCommand = "rsync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}" 
+    
+    Chef::Log.info "Caylent-Deploy.update_wpcontent: Running command '#{syncCommand}"
     execute "copy wordpress framework" do
-      command "rsync --recursive --compress -u #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}"
+      command "#{syncCommand}"
     end    
   end
 
   def overwrite_wpcontent(sharedPath, application)
+    
+      overwiteCommand = "cp -R #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}" 
 
+    Chef::Log.info "Caylent-Deploy.update_wpcontent: Running command '#{overwiteCommand}"
     execute "copy wordpress framework" do
-      command "cp -R #{node[:deploy][application][:current_path]}/wp-content/* #{sharedPath}"
+      command "#{overwiteCommand}"
     end    
   end
 
-  def link_wpcontent(application)
+  def link_wpcontent(sharedPath, application)
 
+    Chef::Log.info "Caylent-Deploy.link_wpcontent: Symlink #{node[:deploy][application][:current_path]}/wp-content to #{sharedPath}/core_framwork"
     link "#{node[:deploy][application][:current_path]}/wp-content" do
-      to "#{node[:deploy][application][:shared_content_folder]}"
+      to "#{sharedPath}"
       link_type :symbolic
       owner "deploy"
       group "www-data"
@@ -105,14 +114,16 @@ define :wordpress_deployment_localisation do
   end
       
   def update_permissions(application)
-    Chef::Log.info "Caylent-Deploy: Running command chown -R deploy:www-data ./"
+    updateCommand = "chown -R deploy:www-data #{node[:deploy][application][:current_path]}/" 
+    Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{updateCommand}"
     execute "owner" do
-      command "chown -R deploy:www-data ./"
-      cwd "#{node[:deploy][application][:current_path]}/"
+      command "#{updateCommand}"
     end
     
+    permissionsCommand = "chmod -R 775 #{node[:deploy][application][:current_path]}" 
+    Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{permissionsCommand}"
     execute "change permissions on wordpress framework" do
-      command "chmod -R 775 #{node[:deploy][application][:current_path]}"
+      command "#{permissionsCommand}"
     end
   end
 
@@ -143,7 +154,7 @@ define :wordpress_deployment_localisation do
         #check_for_sql_file
         remove_current_symlink(application)
         setup_wordpress_framework(application)
-        link_wpcontent(application)
+        link_wpcontent(sharedPath, application)
         update_permissions(application)
       
       when "update"
@@ -152,7 +163,7 @@ define :wordpress_deployment_localisation do
         #check_for_sql_file
         remove_current_symlink(application)
         setup_wordpress_framework(application)
-        link_wpcontent(application)
+        link_wpcontent(sharedPath, application)
         update_permissions(application)
         
       when "overwrite"
@@ -162,7 +173,7 @@ define :wordpress_deployment_localisation do
         #check_for_sql_file
         remove_current_symlink(application)
         setup_wordpress_framework(application)
-        link_wpcontent(application)
+        link_wpcontent(sharedPath, application)
         update_permissions(application)
       else
         Chef::Log.info "Caylent-deploy: No case matched so no other actions taken"
