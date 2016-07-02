@@ -132,7 +132,7 @@ define :wordpress_deployment_localisation do
       command "#{updateSharedCommand}"
     end
     
-    permissionsSharedCommand = "chmod -R 775 #{permissionsSharedCommand}" 
+    permissionsSharedCommand = "chmod -R 775 #{sharedPath}" 
     Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{permissionsSharedCommand}"
     execute "change permissions on wordpress framework" do
       command "#{permissionsSharedCommand}"
