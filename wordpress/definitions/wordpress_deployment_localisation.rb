@@ -113,7 +113,7 @@ define :wordpress_deployment_localisation do
     
   end
       
-  def update_permissions(application)
+  def update_permissions(sharedPath, application)
     updateCommand = "chown -R deploy:www-data #{node[:deploy][application][:current_path]}/" 
     Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{updateCommand}"
     execute "owner" do
@@ -125,6 +125,19 @@ define :wordpress_deployment_localisation do
     execute "change permissions on wordpress framework" do
       command "#{permissionsCommand}"
     end
+
+    updateSharedCommand = "chown -R deploy:www-data #{sharedPath}/" 
+    Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{updateSharedCommand}"
+    execute "owner" do
+      command "#{updateSharedCommand}"
+    end
+    
+    permissionsSharedCommand = "chmod -R 775 #{permissionsSharedCommand}" 
+    Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{permissionsSharedCommand}"
+    execute "change permissions on wordpress framework" do
+      command "#{permissionsSharedCommand}"
+    end
+    
   end
 
   def deploy_cms_framework(sharedPath, application)
@@ -155,7 +168,7 @@ define :wordpress_deployment_localisation do
         remove_current_symlink(application)
         setup_wordpress_framework(application)
         link_wpcontent(sharedPath, application)
-        update_permissions(application)
+        update_permissions(sharedPath, application)
       
       when "update"
         Chef::Log.info "Caylent-Deploy: Case Match for Update"
@@ -164,7 +177,7 @@ define :wordpress_deployment_localisation do
         remove_current_symlink(application)
         setup_wordpress_framework(application)
         link_wpcontent(sharedPath, application)
-        update_permissions(application)
+        update_permissions(sharedPath, application)
         
       when "overwrite"
        Chef::Log.info "Caylent-Deploy: Case Match for Overwrite"
@@ -174,7 +187,7 @@ define :wordpress_deployment_localisation do
         remove_current_symlink(application)
         setup_wordpress_framework(application)
         link_wpcontent(sharedPath, application)
-        update_permissions(application)
+        update_permissions(sharedPath, application)
       else
         Chef::Log.info "Caylent-deploy: No case matched so no other actions taken"
     end
