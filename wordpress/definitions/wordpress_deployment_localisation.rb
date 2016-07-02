@@ -67,7 +67,7 @@ define :wordpress_deployment_localisation do
     cpCommand = "cp -r /tmp/wordpress/* #{node[:deploy][application][:deploy_to]}/core_framwork/"
     Chef::Log.info "Caylent-Deploy.setup_wordpress_framework: Running command '#{cpCommand}"
     execute "copy wordpress framework" do
-      command "cpCommand"
+      command "#{cpCommand}"
     end
     
     Chef::Log.info "Caylent-Deploy.setup_wordpress_framework:Creating file #{node[:deploy][application][:current_path]}/wp-config.php"
