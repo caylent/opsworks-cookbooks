@@ -10,7 +10,7 @@
 # Wordpress Setup Attributes
 ############################################################
 
-default[:opsworks][:wordpress][:version] = "4.3.1"
+default[:opsworks][:wordpress][:version] = "4.5.3"
 
 ############################################################
 # Wordpress Deployment Attributes
