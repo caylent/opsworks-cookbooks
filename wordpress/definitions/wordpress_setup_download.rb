@@ -24,7 +24,7 @@ define :wordpress_setup_download do
       command "tar -xvzf wordpress-#{node[:opsworks][:wordpress][:version]}.tar.gz"
       cwd "/tmp"
     end
-    Chef::Log.info "Caylent--setup: Removing word wordpress/wp-content folder"
+    Chef::Log.info "Caylent-setup: Removing word wordpress/wp-content folder"
     execute "remove wp-content" do
       command "rm -R wordpress/wp-content"
       cwd "/tmp"
