@@ -12,18 +12,24 @@ define :wordpress_deployment_localisation do
 
   application = params[:application_name]
 
+  #Ensure nothing changes on nfs layer. All nodes in nfs layer
+  #are skipped
   if !node[:opsworks][:instance][:layers].include?("nfs")
     
-    # Only perform migrations on a single appserver to avoid collisions.
     layerName = node[:opsworks][:instance][:layers][0]
-    Chef::Log.warn "Debug layer name #{layerName} #{node[:opsworks][:layers][layerName]}"
-    migration_instance_ip = node[:opsworks][:layers][layerName][:instances].keys.sort.first[:private_ip]
-    current_ip = node[:opsworks][:instance][:private_ip]
-    if migration_instance_ip == current_ip
-        master = true
-    else
-        master = false
+    # Check instances have been added to layer
+    if !node[:opsworks][:layers][layerName][:instances].nil?
+        Chef::Log.warn "Debug layer name #{layerName} #{node[:opsworks][:layers][layerName]}"
+        # Only perform migrations on a single appserver to avoid collisions.
+        migration_instance_ip = node[:opsworks][:layers][layerName][:instances].keys.sort.first[:private_ip]
+        current_ip = node[:opsworks][:instance][:private_ip]
+        if migration_instance_ip == current_ip
+            master = true
+        else
+            master = false
+        end
     end
+
     
     Chef::Log.info "Caylent-Deploy: Running wordpress localise for #{application}."
     
@@ -176,17 +182,12 @@ define :wordpress_deployment_localisation do
       case deploy_action
         when "add"
           Chef::Log.info "Caylent-Deploy: Case Match for Add"
-          if master 
-            add_wpcontent(sharedPath, application)
-          end
-
+          add_wpcontent(sharedPath, application)
           #check_for_sql_file
           remove_current_symlink(application)
           setup_wordpress_framework(application)
           link_wpcontent(sharedPath, application)
-          if master 
-            update_permissions(sharedPath, application)
-          end
+          update_permissions(sharedPath, application)
         
         when "update"
           Chef::Log.info "Caylent-Deploy: Case Match for Update"
