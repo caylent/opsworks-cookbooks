@@ -19,7 +19,7 @@ define :wordpress_deployment_localisation do
     layerName = node[:opsworks][:instance][:layers][0]
     # Check instances have been added to layer
     if !node[:opsworks][:layers][layerName][:instances].nil? || !node[:opsworks][:layers][layerName][:instances].empty?
-        Chef::Log.warn "Debug layer name #{layerName} #{node[:opsworks][:layers][layerName][:instances].empty?}"
+        Chef::Log.warn "Debug layer name #{layerName} #{node[:opsworks][:layers][layerName][:instances].empty?} #{node[:opsworks][:layers][layerName][:instances].nil?}"
         # Only perform migrations on a single appserver to avoid collisions.
         migration_instance_ip = node[:opsworks][:layers][layerName][:instances].keys.sort.first[:private_ip]
         current_ip = node[:opsworks][:instance][:private_ip]
