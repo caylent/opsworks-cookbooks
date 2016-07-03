@@ -15,8 +15,8 @@ define :wordpress_deployment_localisation do
   if !node[:opsworks][:instance][:layers].include?("nfs")
     
     # Only perform migrations on a single appserver to avoid collisions.
-    layerName = node[:opsworks][:instance][:layers].keys.sort.first
-    migration_instance_ip = node[:opsworks][:layers][layerName][:instances].keys.sort.first[:private_ip]
+    layerName = node[:opsworks][:instance][:layers][0]
+    migration_instance_ip = node[:opsworks][:layers][layerName][:instances][0][:private_ip]
     current_ip = node[:opsworks][:instance][:private_ip]
     if migration_instance_ip == current_ip
         master = true
