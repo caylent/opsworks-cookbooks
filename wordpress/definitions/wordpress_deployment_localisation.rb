@@ -85,7 +85,7 @@ define :wordpress_deployment_localisation do
         mode '775'
       end
       
-      cpCommand = "cp -r /tmp/wordpress/* #{node[:deploy][application][:deploy_to]}/core_framwork/"
+      cpCommand = "cp -r /tmp/wordpress #{node[:deploy][application][:deploy_to]}/core_framwork"
       Chef::Log.info "Caylent-Deploy.setup_wordpress_framework: Running command '#{cpCommand}"
       execute "copy wordpress framework" do
         command "#{cpCommand}"
