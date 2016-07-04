@@ -21,7 +21,7 @@ define :wordpress_deployment_localisation do
     if !node[:opsworks][:layers][layerName][:instances].nil? && !node[:opsworks][:layers][layerName][:instances].empty?
         Chef::Log.warn "Debug layer name #{layerName} #{node[:opsworks][:layers][layerName][:instances].first}"
         # Only perform migrations on a single appserver to avoid collisions.
-        migration_instance = node[:opsworks][:layers][layerName][:instances].first
+        migration_instance = node[:opsworks][:layers][layerName][:instances].first[1]
         current_ip = node[:opsworks][:instance][:private_ip]
         if migration_instance[:private_ip] == current_ip
             master = true
