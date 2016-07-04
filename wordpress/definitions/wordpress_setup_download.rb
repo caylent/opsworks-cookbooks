@@ -34,7 +34,6 @@ define :wordpress_setup_download do
         source ".htaccess.erb"
         owner "root"
         mode 0644
-        variables ({:application => node[:deploy][application]})
       end
     
   end
