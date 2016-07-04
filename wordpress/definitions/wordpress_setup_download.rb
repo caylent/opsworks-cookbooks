@@ -29,5 +29,13 @@ define :wordpress_setup_download do
       command "rm -R wordpress/wp-content"
       cwd "/tmp"
     end
+      Chef::Log.info "Caylent-setup:Creating file /tmp/wordpress/.htaccess"
+      template "/tmp/wordpress/.htaccess" do
+        source ".htaccess.erb"
+        owner "root"
+        mode 0644
+        variables ({:application => node[:deploy][application]})
+      end
+    
   end
 end
