@@ -24,8 +24,10 @@ define :wordpress_deployment_localisation do
         migration_instance = node[:opsworks][:layers][layerName][:instances].first[1]
         current_ip = node[:opsworks][:instance][:private_ip]
         if migration_instance[:private_ip] == current_ip
+            Chef::Log.info "Master Set"
             master = true
         else
+            Chef::Log.info "No match found master not set" 
             master = false
         end
     end
