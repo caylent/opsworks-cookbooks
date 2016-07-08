@@ -67,7 +67,7 @@ define :wordpress_deployment_localisation do
       link "#{node[:deploy][application][:current_path]}" do
         to "#{node[:deploy][application][:deploy_to]}/core_framwork"
         link_type :symbolic
-        owner "deploy"
+        owner "www-data"
         group "www-data"
         mode "775"
       end
@@ -80,7 +80,7 @@ define :wordpress_deployment_localisation do
     def setup_wordpress_framework(application)
 
       directory "#{node[:deploy][application][:deploy_to]}/core_framwork/" do
-        owner 'deploy'
+        owner 'www-data'
         group 'www-data'
         mode '775'
       end
@@ -127,7 +127,7 @@ define :wordpress_deployment_localisation do
       link "#{node[:deploy][application][:current_path]}/wp-content" do
         to "#{sharedPath}"
         link_type :symbolic
-        owner "deploy"
+        owner "www-data"
         group "www-data"
         mode "775"
       end
@@ -135,7 +135,7 @@ define :wordpress_deployment_localisation do
     end
         
     def update_permissions(sharedPath, application)
-      updateCommand = "chown -R deploy:www-data #{node[:deploy][application][:current_path]}/" 
+      updateCommand = "chown -R www-data:www-data #{node[:deploy][application][:current_path]}/" 
       Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{updateCommand}"
       execute "owner" do
         command "#{updateCommand}"
@@ -147,7 +147,7 @@ define :wordpress_deployment_localisation do
         command "#{permissionsCommand}"
       end
 
-      updateSharedCommand = "chown -R deploy:www-data #{sharedPath}/" 
+      updateSharedCommand = "chown -R www-data:www-data #{sharedPath}/" 
       Chef::Log.info "Caylent-Deploy.update_permissions: Running command #{updateSharedCommand}"
       execute "owner" do
         command "#{updateSharedCommand}"
