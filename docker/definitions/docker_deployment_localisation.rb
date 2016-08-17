@@ -76,7 +76,7 @@ define :docker_deployment_localisation do
   env_commands = ""
   node[:deploy][application][:environment_variables].each do |key, value|
     Chef::Log.info "Adding #{key} and #{value}"
-    if key.excludes? "docker_"
+    if !key.include? "docker_"
       env_commands = "#{env_commands} -e #{key}:#{value}"
     end
   end
