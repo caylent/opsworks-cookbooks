@@ -74,10 +74,11 @@ define :docker_deployment_localisation do
   end
   
   env_commands = ""
-  node[:deploy][application][:environment_variables].each do |key , value|
-      if value.excludes? "docker_"
-          env_commands = "#{env_commands} -e " + key + ":" + value
-      end
+  node[:deploy][application][:environment_variables].each do |key, value|
+    Chef::Log.info "Adding #{key} and #{value}"
+    if value.excludes? "docker_"
+      env_commands = "#{env_commands} -e " + key + ":" + value
+    end
   end
 
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
