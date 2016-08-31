@@ -23,6 +23,8 @@ define :docker_deployment_localisation do
   docker_username = "#{node[:deploy][application][:environment_variables][:docker_username]}"
   docker_password = "#{node[:deploy][application][:environment_variables][:docker_password]}"
   docker_email = "#{node[:deploy][application][:environment_variables][:docker_email]}"
+  ports = "#{node[:deploy][application][:environment_variables][:ports]}"
+  deploy_commands = "#{node[:deploy][application][:environment_variables][:deploy_commands]}"
 
   Chef::Log.info "Caylent-Deploy: Running docker localise for #{application}."
 
@@ -74,17 +76,30 @@ define :docker_deployment_localisation do
   end
   
   env_commands = ""
+  ports = ""
+  deploy_commands = []
   node[:deploy][application][:environment_variables].each do |key, value|
     Chef::Log.info "Adding #{key} and #{value}"
-    if !key.include? "docker_"
-      env_commands = "#{env_commands} -e #{key}=#{value}"
+    case key
+    when "ports"
+      value.split(",").each do |port|
+        ports = "#{ports} -p #{port}"
+      end
+    when "deploy_commands"
+      value.split(",").each do |command|
+        deploy_commands.push(command)
+      end
+    else 
+      if !key.include? "docker_"
+        env_commands = "#{env_commands} -e #{key}=#{value}"
+      end
     end
   end
 
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "dirty-start" do
-    command "docker run -p 80:80 #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
+    command "docker run #{ports} #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version} #{config_commands}"
     ignore_failure true
   end
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
@@ -107,8 +122,11 @@ define :docker_deployment_localisation do
   # else
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "run image" do
+      deploy_commands.each.with_index(1) do |command, index|
+        command "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{command}"
+      end
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker run -d #{env_commands} -p 80:80 --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
+      command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     end
   # end
 
