@@ -100,8 +100,9 @@ define :docker_deployment_localisation do
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "dirty-start" do
     deploy_commands.each.with_index(1) do |deploy_command, index|
-       #{deploy_command}
-      command "docker run -d #{env_commands} -p 80:80 --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version}"
+      Chef::Log.info "Running #{deploy_command} with #{index}"
+      Chef::Log.info "DOCKER COMMAND: docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
+      command "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
     end
     command "docker run #{ports} #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     ignore_failure true
@@ -127,7 +128,9 @@ define :docker_deployment_localisation do
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "run image" do
       deploy_commands.each.with_index(1) do |deploy_command, index|
-        command "docker run -d #{env_commands} -p 80:80 --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version}"
+        Chef::Log.info "Running #{deploy_command} with #{index}"
+        Chef::Log.info "DOCKER COMMAND: docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
+        command "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
       end
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
       command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
