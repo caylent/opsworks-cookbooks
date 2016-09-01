@@ -99,7 +99,7 @@ define :docker_deployment_localisation do
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "deploy commands" do
-      docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} '#{deploy_command}'"
+      docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
       Chef::Log.info "Running #{deploy_command} with #{index}"
       Chef::Log.info docker_with_command
       
@@ -124,7 +124,7 @@ define :docker_deployment_localisation do
   end
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "deploy commands" do
-      docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} '#{deploy_command}'"
+      docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
       Chef::Log.info "Running #{deploy_command} with #{index}"
       Chef::Log.info docker_with_command
 
