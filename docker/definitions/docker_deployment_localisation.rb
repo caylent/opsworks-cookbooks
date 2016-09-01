@@ -99,10 +99,11 @@ define :docker_deployment_localisation do
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
   execute "dirty-start" do
-    # deploy_commands.each.with_index(1) do |deploy_command, index|
-    #   command "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
-    # end
-    command "docker run #{ports} #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_commands[0]}"
+    deploy_commands.each.with_index(1) do |deploy_command, index|
+       #{deploy_command}
+      command "docker run -d #{env_commands} -p 80:80 --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version}"
+    end
+    command "docker run #{ports} #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     ignore_failure true
   end
   Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
@@ -125,11 +126,11 @@ define :docker_deployment_localisation do
   # else
     Chef::Log.info "Caylent-Deploy: Attempting to run image"
     execute "run image" do
-      # deploy_commands.each.with_index(1) do |deploy_command, index|
-      #   command "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
-      # end
+      deploy_commands.each.with_index(1) do |deploy_command, index|
+        command "docker run -d #{env_commands} -p 80:80 --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version}"
+      end
       #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_commands[0]}"
+      command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
     end
   # end
 
