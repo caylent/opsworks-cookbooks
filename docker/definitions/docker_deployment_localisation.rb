@@ -99,8 +99,8 @@ define :docker_deployment_localisation do
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "deploy commands" do
+      Chef::Log.info "Running #{deploy_command} prod #{index}"
       docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
-      Chef::Log.info "Running #{deploy_command} with #{index}"
       Chef::Log.info docker_with_command
       
       command docker_with_command
@@ -124,8 +124,8 @@ define :docker_deployment_localisation do
   end
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "deploy commands" do
+      Chef::Log.info "Running #{deploy_command} non-prod with #{index}"
       docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
-      Chef::Log.info "Running #{deploy_command} with #{index}"
       Chef::Log.info docker_with_command
 
       command docker_with_command
@@ -137,11 +137,11 @@ define :docker_deployment_localisation do
   #     command "docker run -e 'DBRELOAD=true' -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
   #   end
   # else
-    Chef::Log.info "Caylent-Deploy: Attempting to run image"
-    execute "run image" do
-      #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-      command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
-    end
+  Chef::Log.info "Caylent-Deploy: Attempting to run image"
+  execute "run image" do
+    #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+    command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
+  end
   # end
 
  end
