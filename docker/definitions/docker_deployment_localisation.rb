@@ -97,6 +97,16 @@ define :docker_deployment_localisation do
   end
 
  if (node[:deploy][application][:environment_variables][:ENV] == "prod")
+  Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
+  execute "dirty-start" do
+    command "docker run #{ports} #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
+    ignore_failure true
+  end
+  Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
+  execute "stop,rename old, start new" do
+    command "docker stop #{docker_containerName} && docker rename #{docker_containerName}-old && docker run #{env_commands} -d -p 80:80 --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
+    ignore_failure false
+  end
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "stop old deploy commands" do
       command "docker rm #{docker_containerName}_#{index}-old; docker stop #{docker_containerName}_#{index} && docker rename #{docker_containerName}_#{index} #{docker_containerName}_#{index}-old"
@@ -109,16 +119,6 @@ define :docker_deployment_localisation do
 
       command docker_with_command
     end
-  end
-  Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
-  execute "dirty-start" do
-    command "docker run #{ports} #{env_commands} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
-    ignore_failure true
-  end
-  Chef::Log.info "Caylent-Deploy: Dirty fix for first boot"
-  execute "stop,rename old, start new" do
-    command "docker stop #{docker_containerName} && docker rename #{docker_containerName}-old && docker run #{env_commands} -d -p 80:80 --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
-    ignore_failure false
   end
  else
   Chef::Log.info "Caylent-Deploy: Docker stop"
@@ -137,6 +137,7 @@ define :docker_deployment_localisation do
     #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
     command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
   end
+  # end
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "stop old deploy commands" do
       command "docker rm #{docker_containerName}_#{index}-old; docker stop #{docker_containerName}_#{index} && docker rename #{docker_containerName}_#{index} #{docker_containerName}_#{index}-old"
@@ -150,7 +151,6 @@ define :docker_deployment_localisation do
       command docker_with_command
     end
   end
-  # end
 
  end
 
