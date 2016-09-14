@@ -40,7 +40,7 @@ define :docker_deployment_localisation do
   ENV['AWS_ACCESS_KEY_ID'] = node[:deploy][application][:environment_variables][:AWS_ACCESS_KEY_ID]
   ENV['AWS_SECRET_ACCESS_KEY'] = node[:deploy][application][:environment_variables][:AWS_SECRET_ACCESS_KEY]
   ENV['AWS_DEFAULT_REGION'] = node[:deploy][application][:environment_variables][:AWS_DEFAULT_REGION]
-  
+
   ruby_block "docker login" do
     block do
         #tricky way to load this Chef::Mixin::ShellOut utilities
@@ -71,10 +71,10 @@ define :docker_deployment_localisation do
 
 
   Chef::Log.info "Attempting to pull image"
-  execute "docker pull for #{docker_url}/#{docker_application}:#{docker_version}" do 
+  execute "docker pull for #{docker_url}/#{docker_application}:#{docker_version}" do
     command "docker pull #{docker_url}/#{docker_application}:#{docker_version}"
   end
-  
+
   env_commands = ""
   ports = ""
   deploy_commands = []
@@ -89,7 +89,7 @@ define :docker_deployment_localisation do
       value.split(",").each do |command|
         deploy_commands.push(command)
       end
-    else 
+    else
       if !key.include? "docker_"
         env_commands = "#{env_commands} -e #{key}=#{value}"
       end
@@ -106,7 +106,7 @@ define :docker_deployment_localisation do
       Chef::Log.info "Running #{deploy_command} in prod #{index}"
       docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
       Chef::Log.info docker_with_command
-      
+
       command docker_with_command
     end
   end
@@ -126,6 +126,17 @@ define :docker_deployment_localisation do
     command "docker rm #{docker_containerName}-old; docker stop #{docker_containerName} && docker rename #{docker_containerName} #{docker_containerName}-old"
     ignore_failure true
   end
+  # if (node[:deploy][application][:environment_variables][:db_reload] == "1")
+  #   Chef::Log.info "Caylent-Deploy: Attempting to run image with db reload"
+  #   execute "copy docker framework" do
+  #     command "docker run -e 'DBRELOAD=true' -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+  #   end
+  # else
+  Chef::Log.info "Caylent-Deploy: Attempting to run image"
+  execute "run image" do
+    #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
+    command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
+  end
   deploy_commands.each.with_index(1) do |deploy_command, index|
     execute "stop old deploy commands" do
       command "docker rm #{docker_containerName}_#{index}-old; docker stop #{docker_containerName}_#{index} && docker rename #{docker_containerName}_#{index} #{docker_containerName}_#{index}-old"
@@ -138,17 +149,6 @@ define :docker_deployment_localisation do
 
       command docker_with_command
     end
-  end
-  # if (node[:deploy][application][:environment_variables][:db_reload] == "1")
-  #   Chef::Log.info "Caylent-Deploy: Attempting to run image with db reload"
-  #   execute "copy docker framework" do
-  #     command "docker run -e 'DBRELOAD=true' -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-  #   end
-  # else
-  Chef::Log.info "Caylent-Deploy: Attempting to run image"
-  execute "run image" do
-    #command "docker run -p 80:80 -p 443:443 #{node[:deploy][application][:environment_variables][:docker_image]}:#{node[:deploy][application][:environment_variables][:docker_version]}"
-    command "docker run -d #{env_commands} #{ports} --name #{docker_containerName} #{docker_url}/#{docker_application}:#{docker_version}"
   end
   # end
 
