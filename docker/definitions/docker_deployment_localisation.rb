@@ -114,7 +114,7 @@ define :docker_deployment_localisation do
     end
     execute "deploy commands" do
       Chef::Log.info "Running #{deploy_command} in prod #{index}"
-      docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
+      docker_with_command = "docker run -d #{env_commands} #{ports} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
       Chef::Log.info docker_with_command
 
       command docker_with_command
@@ -139,13 +139,9 @@ define :docker_deployment_localisation do
   end
   # end
   deploy_commands.each.with_index(1) do |deploy_command, index|
-    execute "stop old deploy commands" do
-      command "docker rm #{docker_containerName}_#{index}-old; docker stop #{docker_containerName}_#{index} && docker rename #{docker_containerName}_#{index} #{docker_containerName}_#{index}-old"
-      ignore_failure true
-    end
     execute "deploy commands" do
       Chef::Log.info "Running #{deploy_command} non-prod with #{index}"
-      docker_with_command = "docker run -d #{env_commands} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
+      docker_with_command = "docker run -d #{env_commands} #{ports} --name #{docker_containerName}_#{index} #{docker_url}/#{docker_application}:#{docker_version} #{deploy_command}"
       Chef::Log.info docker_with_command
 
       command docker_with_command
